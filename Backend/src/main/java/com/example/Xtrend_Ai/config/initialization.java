@@ -20,10 +20,6 @@ public class initialization {
 
     private final UserRepository userRepository;
 
-
-
-
-
     @Bean
     CommandLineRunner commandLineRunner() {
         return args->{

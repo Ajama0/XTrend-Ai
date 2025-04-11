@@ -53,6 +53,7 @@ public class User {
 
     @ElementCollection
     @Column(nullable = true)
+    @Enumerated(EnumType.STRING)
     private List<Topics> interests = new ArrayList<>();
 
     @Column(name = "Created_At")
