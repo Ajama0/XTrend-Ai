@@ -1,12 +1,14 @@
 package com.example.Xtrend_Ai.models;
 
 
+import com.example.Xtrend_Ai.enums.Topics;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,14 +53,14 @@ public class User {
 
     @ElementCollection
     @Column(nullable = true)
-    private List<String> interests = new ArrayList<>();
+    private List<Topics> interests = new ArrayList<>();
 
     @Column(name = "Created_At")
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
 
     @Column(name = "Updated_At")
-    private LocalDate updatedAt;
+    private LocalDateTime updatedAt;
 
 
 }
