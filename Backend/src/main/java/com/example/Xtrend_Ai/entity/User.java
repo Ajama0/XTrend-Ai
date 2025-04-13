@@ -1,13 +1,10 @@
-package com.example.Xtrend_Ai.models;
+package com.example.Xtrend_Ai.entity;
 
 
 import com.example.Xtrend_Ai.enums.Topics;
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.boot.autoconfigure.web.WebProperties;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;

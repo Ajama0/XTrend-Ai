@@ -1,7 +1,7 @@
 package com.example.Xtrend_Ai.controller;
 
 
-import com.example.Xtrend_Ai.models.User;
+import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.service.LoginService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

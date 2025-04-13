@@ -1,4 +1,4 @@
-package com.example.Xtrend_Ai.models;
+package com.example.Xtrend_Ai.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -16,6 +16,7 @@ import java.net.URL;
 @Builder
 public class VideoContent extends Content {
 
+
     private URL videoUrl;
 
     private String videoTitle;
@@ -28,7 +29,7 @@ public class VideoContent extends Content {
      */
     @ManyToOne
     @JoinColumn(name = "news_id")
-    private News news;
+    private Article news;
 
 
 }

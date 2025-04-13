@@ -1,6 +1,7 @@
-package com.example.Xtrend_Ai.models;
+package com.example.Xtrend_Ai.entity;
 
 
+import com.example.Xtrend_Ai.enums.Types;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -9,7 +10,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(columnDefinition = "content_type")
 @Entity
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor
@@ -44,5 +44,10 @@ public abstract class Content {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    /// allows us to define the content type for convenient querying later
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Types type;
 
 }

@@ -2,14 +2,13 @@ package com.example.Xtrend_Ai.config;
 
 
 import com.example.Xtrend_Ai.enums.Topics;
-import com.example.Xtrend_Ai.models.User;
+import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
