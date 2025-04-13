@@ -19,5 +19,5 @@ public interface ApiService {
      */
 
     @GET(value = "/v2/top-headlines")
-    Call<List<NewsResponse>> topHeadlines(@QueryMap Map<String,String> query);
+    Call<NewsResponse> topHeadlines(@QueryMap Map<String,String> query);
 }
