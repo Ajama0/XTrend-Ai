@@ -10,7 +10,7 @@ public class NewsUtils {
 
     public static Map<String,String> generateQuery(String apiKey){
         Map<String,String> query = new HashMap<>();
-        query.put("api_key",apiKey);
+        query.put("apiKey",apiKey);
         return query;
     }
 }

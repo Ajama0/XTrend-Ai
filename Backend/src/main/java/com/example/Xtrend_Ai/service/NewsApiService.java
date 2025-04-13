@@ -18,6 +18,7 @@ import retrofit2.Callback;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +46,10 @@ public class NewsApiService {
     public void getTopHeadlines(NewsRequest newsRequest, final ArticlesResponseCallback callback){
         /// here we use the api client to return an impl of the base ApiService.
 
+        log.info("api key is....{}", newsApi);
         Map<String, String> query = NewsUtils.generateQuery(newsApi);
+
+        log.info("api key inside query is : {}" , query.values());
         query.put("country", newsRequest.getCountry());
         query.put("language", newsRequest.getLanguage());
         query.put("category", newsRequest.getCategory());
@@ -63,7 +67,9 @@ public class NewsApiService {
                     @Override
                     public void onResponse(Call<NewsResponse> call, retrofit2.Response<NewsResponse> response) {
                         if (response.code() == HttpURLConnection.HTTP_OK){
+                            log.info("ok some data returned");
                             callback.onSuccess(response.body());
+                            log.info("top headlines success : {}", response.body());
                         }
 
                         else{
@@ -81,6 +87,9 @@ public class NewsApiService {
                         callback.onFailure(throwable.getMessage());
                     }
                 });
+
+        log.info("synchronous process completed");
+
     }
 
 
@@ -93,11 +102,13 @@ public class NewsApiService {
             throw new ArticleNotFoundException("no Articles were  found");
         }
 
-        News news = News.builder()
-                .articles(newsResponse.getArticles())
-                .build();
-
-        newsRepository.save(news);
+        for (Article article : newsResponse.getArticles()){
+            newsRepository.save(
+                    News.builder()
+                            .article(article)
+                            .build()
+            );
+        }
     }
 
 
@@ -113,5 +124,7 @@ public class NewsApiService {
         return newsList;
 
     }
+
+
 
 }

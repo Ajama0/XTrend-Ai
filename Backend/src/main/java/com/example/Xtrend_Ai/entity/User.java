@@ -60,6 +60,5 @@ public class User {
     @Column(name = "Updated_At")
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "user")
-    private List<Content> content = new ArrayList<>();
+
 }

@@ -30,8 +30,7 @@ public class News {
     private Long id;
 
 
-    @Column(name="articles", nullable = false)
-    @Lob
-    private List<Article> articles;
+    @Column(name="article", nullable = false)
+    private Article article;
 
 }

@@ -1,8 +1,6 @@
 package com.example.Xtrend_Ai.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.net.URL;
@@ -14,8 +12,19 @@ import java.net.URL;
 @Setter
 @ToString
 @Builder
-public class VideoContent extends Content {
+public class VideoContent{
 
+
+    @SequenceGenerator(sequenceName = "videoContent_sequence",
+            name = "videoContent_sequence",
+            allocationSize = 1
+    )
+
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "videoContent_sequence"
+    )
+    @Id
+    private Long id;
 
     private URL videoUrl;
 
@@ -29,7 +38,10 @@ public class VideoContent extends Content {
      */
     @ManyToOne
     @JoinColumn(name = "news_id")
-    private Article news;
+    private News news;
 
+    @ManyToOne
+    @JoinColumn(name="user_id",nullable = false)
+    private User user;
 
 }

@@ -14,11 +14,20 @@ import org.springframework.stereotype.Service;
 @Service
 @Builder
 @ToString
-public class NewsContent extends Content {
+public class NewsContent {
 
-    /**
-     * This class contains the news Content(article/blog) returned by Open Ai API which reflects the personalized content
-     */
+    @SequenceGenerator(sequenceName = "newsContent_sequence",
+            name = "newsContent_sequence",
+            allocationSize = 1
+    )
+
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+        generator = "newsContent_sequence"
+    )
+
+    @Id
+    private Long id;
+
 
     @Column(nullable = false)
     private String title;
@@ -36,6 +45,10 @@ public class NewsContent extends Content {
     @ManyToOne
     @JoinColumn(name = "news_id")
     private News news;
+
+    @ManyToOne
+    @JoinColumn(name="user_id",nullable = false)
+    private User user;
 
 
 
