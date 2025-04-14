@@ -1,6 +1,6 @@
 package com.example.Xtrend_Ai.service;
-import com.example.Xtrend_Ai.client.ApiClient;
-import com.example.Xtrend_Ai.client.ApiService;
+import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
+import com.example.Xtrend_Ai.client.NewsApi.ApiService;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.Article;
@@ -12,13 +12,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 import retrofit2.Call;
 import retrofit2.Callback;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

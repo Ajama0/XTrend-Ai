@@ -30,7 +30,7 @@ public class News {
     private Long id;
 
 
-    @Column(name="article", nullable = false)
+
     private Article article;
 
 }

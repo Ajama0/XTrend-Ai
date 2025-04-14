@@ -1,4 +1,4 @@
-package com.example.Xtrend_Ai.client;
+package com.example.Xtrend_Ai.client.NewsApi;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;

@@ -1,11 +1,10 @@
-package com.example.Xtrend_Ai.client;
+package com.example.Xtrend_Ai.client.NewsApi;
 
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.QueryMap;
 
-import java.util.List;
 import java.util.Map;
 
 
