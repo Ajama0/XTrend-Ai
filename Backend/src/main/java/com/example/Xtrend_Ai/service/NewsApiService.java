@@ -1,4 +1,5 @@
 package com.example.Xtrend_Ai.service;
+import com.example.Xtrend_Ai.client.DiffBot.DiffBotClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiService;
 import com.example.Xtrend_Ai.dto.NewsRequest;
@@ -10,8 +11,6 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.NewsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
@@ -22,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -32,15 +32,16 @@ public class NewsApiService {
 
     @Value("${news.api}")
     private String newsApi;
+
+    @Value("${d")
+
+
+
+
     private final NewsRepository newsRepository;
     private final ApiClient apiClient;
     ApiService apiService = apiClient.getApiService();
-
-    private final OkHttpClient okHttpClient;
-
-
-
-
+    private final DiffBotClient diffBotClient;
 
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);
@@ -128,6 +129,26 @@ public class NewsApiService {
         return newsList;
 
     }
+
+
+    /**
+     *
+     * @param id - the id of the article the user wants to generate a blog from
+     * @param url - url pointing to the exact article which allows us to extract content
+     * @return
+     */
+    public T <T> generateBlog(Long id, String url){
+        Optional<News> news = newsRepository.findById(id);
+        if(news.isEmpty()){
+            throw new ArticleNotFoundException("no Articles were found");
+        }
+        /// we need to pass the token and the url to the method that makes our call to the diffbot api
+
+
+
+    }
+
+
 
 
 

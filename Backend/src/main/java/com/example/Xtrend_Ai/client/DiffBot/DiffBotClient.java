@@ -1,22 +1,37 @@
 package com.example.Xtrend_Ai.client.DiffBot;
 
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import java.io.IOException;
 
 @Slf4j
-@Configuration
+@Component
+@Data
 public class DiffBotClient {
 
-    @Value("${diffbot.api.key}")
-    private String DIFF_API_KEY;
+
+    @Value("${diffBot.api.key}")
+    private String apiKey;
+    private final OkHttpClient client;
+
+    @Value("${diffBot_url}")
+    private String diffBotUrl;
+
+
+    public DiffBotClient(@Qualifier("DifBotHttpClient")OkHttpClient client) {
+        this.client = client;
+    }
 
     /**
      * difbot allows us to extract the textual content from the article URL, whenever a user is set to generate a blog
@@ -30,14 +45,15 @@ public class DiffBotClient {
      */
 
 
-    public Request diffBotRequest(String url){;
+    public ResponseBody diffBotRequest(String url) throws IOException {;
         Request request = new Request.Builder()
-                .url() /// the url will be specific article the user request plus it will include our token
+                .url(url) /// the url will be specific article the user request plus it will include our token
                 .get()
                 .addHeader("accept", "application/json")
                 .build();
 
-                return request;
+        Response response = client.newCall(request).execute();
+        return response.body();
 
     }
 
