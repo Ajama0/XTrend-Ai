@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NewsService } from '../services/news.service';
 import { Observable } from 'rxjs';
 import { News } from '../models/News';
@@ -10,29 +10,40 @@ import { Articles } from '../models/Articles';
   templateUrl: './news.component.html',
   styleUrl: './news.component.css'
 })
-export class NewsComponent {
+export class NewsComponent implements OnInit{
 
-  articles!:Array<Articles>
+  
+  articleList:Array<Articles> = []
   /**
    * we define the observable that returns the trending news, in which we can subscribe to emit the data
    */
-  news$ !:Observable<News>  
-  constructor(newsService:NewsService){
-    this.news$ = newsService.getAllTrendingNews()
+  news$ !:Observable<Array<News>>  
+
+  constructor(private newsService:NewsService){
+  }
+
+  ngOnInit(): void {
+    console.log("making request")
+    this.news$ = this.newsService.getAllTrendingNews()
     
+    console.log("about to subscribe")
+    this.fetchAllTrendingNews()
   }
 
   fetchAllTrendingNews(){
     this.news$.subscribe({
-      next:(news:News)=>{
+      next:(news:Array<News>)=>{
         ///store the value of the return so that we can pass it as an input to the dashboard component
-        const articlesList = news.articles
-        if(articlesList.length == 0){
+    
+        if(news.length == 0){
           console.log("no articles were returned")
+
         }
         else{
-          console.log("the number of articles returned is : ",articlesList.length)
-          this.articles = articlesList
+          console.log("the number of articles returned is : ",news.length)
+          this.articleList = news.map(n=>n.article)
+          console.log(this.articleList)
+          
         }  
         
       },

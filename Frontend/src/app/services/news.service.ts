@@ -13,9 +13,10 @@ export class NewsService {
   constructor(private http:HttpClient) { }
 
 
-  getAllTrendingNews():Observable<News>{
-    const allNewsUrl = `${this.API_BASE}/v1/news/`
-    return this.http.get<News>(allNewsUrl);
+  getAllTrendingNews():Observable<Array<News>>{
+    const allNewsUrl = `${this.API_BASE}/news/all/articles`
+    console.log(allNewsUrl)
+    return this.http.get<Array<News>>(allNewsUrl);
 
   }
 
