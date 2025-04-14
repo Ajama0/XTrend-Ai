@@ -10,6 +10,8 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.NewsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
@@ -24,14 +26,18 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
+
 public class NewsApiService {
 
 
     @Value("${news.api}")
     private String newsApi;
     private final NewsRepository newsRepository;
-    ApiClient apiClient = new ApiClient();
+    private final ApiClient apiClient;
     ApiService apiService = apiClient.getApiService();
+
+    private final OkHttpClient okHttpClient;
+
 
 
 
@@ -43,6 +49,7 @@ public class NewsApiService {
 
     public void getTopHeadlines(NewsRequest newsRequest, final ArticlesResponseCallback callback){
         /// here we use the api client to return an impl of the base ApiService.
+
 
         log.info("api key is....{}", newsApi);
         Map<String, String> query = NewsUtils.generateQuery(newsApi);

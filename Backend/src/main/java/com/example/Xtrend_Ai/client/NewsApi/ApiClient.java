@@ -1,19 +1,28 @@
 package com.example.Xtrend_Ai.client.NewsApi;
 
+import lombok.RequiredArgsConstructor;
 import okhttp3.OkHttpClient;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.concurrent.TimeUnit;
 
+
+@Component
 public class ApiClient {
 
-    OkHttpClient httpClient = new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build();
 
+    private final OkHttpClient httpClient;
+
+    /**
+     * spring now knows which instance of Okhttpclient to inject based on their configs
+     * @param httpClient - the configured http client with timeouts
+     */
+    public ApiClient(@Qualifier("NewsApiHttpClient") OkHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
     public Retrofit getRetrofit() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("https://newsapi.org/")
