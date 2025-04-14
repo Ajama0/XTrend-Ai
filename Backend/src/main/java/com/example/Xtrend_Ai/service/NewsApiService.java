@@ -49,7 +49,7 @@ public class NewsApiService {
         log.info("api key is....{}", newsApi);
         Map<String, String> query = NewsUtils.generateQuery(newsApi);
 
-        log.info("api key inside query is : {}" , query.values());
+        log.info("api key inside query is : {}" , query.get("apiKey"));
         query.put("country", newsRequest.getCountry());
         query.put("language", newsRequest.getLanguage());
         query.put("category", newsRequest.getCategory());
@@ -103,11 +103,10 @@ public class NewsApiService {
         }
 
         for (Article article : newsResponse.getArticles()){
-            newsRepository.save(
-                    News.builder()
+            News news = News.builder()
                             .article(article)
-                            .build()
-            );
+                                    .build();
+            newsRepository.save(news);
         }
     }
 

@@ -28,29 +28,29 @@ public class initialization {
              * users will be redirected based on their interests of news/topics
              */
 
-            User harry = User.builder()
-                    .firstname("harry")
-                    .lastname("james")
-                    .email("harry@example.com")
-                    .password("harry1234")
-                    .interests(List.of(Topics.FINANCE, Topics.AI, Topics.GAMING))
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-
-            User alex = User.builder()
-                    .firstname("alex")
-                    .lastname("jacob")
-                    .email("alex@example.com")
-                    .password("alex1234")
-                    .interests(List.of(Topics.AUTOMOTIVE, Topics.SCIENCE, Topics.GAMING))
-                    .createdAt(LocalDateTime.now())
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-
-
-            userRepository.saveAll(List.of(harry, alex));
-        };
+//            User harry = User.builder()
+//                    .firstname("harry")
+//                    .lastname("james")
+//                    .email("harry@example.com")
+//                    .password("harry1234")
+//                    .interests(List.of(Topics.FINANCE, Topics.AI, Topics.GAMING))
+//                    .createdAt(LocalDateTime.now())
+//                    .updatedAt(LocalDateTime.now())
+//                    .build();
+//
+//
+//            User alex = User.builder()
+//                    .firstname("alex")
+//                    .lastname("jacob")
+//                    .email("alex@example.com")
+//                    .password("alex1234")
+//                    .interests(List.of(Topics.AUTOMOTIVE, Topics.SCIENCE, Topics.GAMING))
+//                    .createdAt(LocalDateTime.now())
+//                    .updatedAt(LocalDateTime.now())
+//                    .build();
+//
+//
+//            userRepository.saveAll(List.of(harry, alex));
+       };
     }
 }
