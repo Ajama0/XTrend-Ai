@@ -2,6 +2,8 @@ package com.example.Xtrend_Ai.service;
 import com.example.Xtrend_Ai.client.DiffBot.DiffBotClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiService;
+import com.example.Xtrend_Ai.dto.DiffBotArticle;
+import com.example.Xtrend_Ai.dto.DiffBotResponse;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.Article;
@@ -9,6 +11,8 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.NewsUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.ResponseBody;
@@ -37,8 +41,6 @@ public class NewsApiService {
     @Value("${d")
 
 
-
-
     private final NewsRepository newsRepository;
     private final ApiClient apiClient;
     ApiService apiService = apiClient.getApiService();
@@ -46,17 +48,18 @@ public class NewsApiService {
 
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);
+
         void onFailure(String error);
     }
 
-    public void getTopHeadlines(NewsRequest newsRequest, final ArticlesResponseCallback callback){
+    public void getTopHeadlines(NewsRequest newsRequest, final ArticlesResponseCallback callback) {
         /// here we use the api client to return an impl of the base ApiService.
 
 
         log.info("api key is....{}", newsApi);
         Map<String, String> query = NewsUtils.generateQuery(newsApi);
 
-        log.info("api key inside query is : {}" , query.get("apiKey"));
+        log.info("api key inside query is : {}", query.get("apiKey"));
         query.put("country", newsRequest.getCountry());
         query.put("language", newsRequest.getLanguage());
         query.put("category", newsRequest.getCategory());
@@ -73,13 +76,11 @@ public class NewsApiService {
                 .enqueue(new Callback<NewsResponse>() {
                     @Override
                     public void onResponse(Call<NewsResponse> call, retrofit2.Response<NewsResponse> response) {
-                        if (response.code() == HttpURLConnection.HTTP_OK){
+                        if (response.code() == HttpURLConnection.HTTP_OK) {
                             log.info("ok some data returned");
                             callback.onSuccess(response.body());
                             log.info("top headlines success : {}", response.body());
-                        }
-
-                        else{
+                        } else {
                             try {
                                 assert response.errorBody() != null;
                                 callback.onFailure(response.errorBody().string());
@@ -104,15 +105,16 @@ public class NewsApiService {
      * here we will handle how the OnSuccess function is handled
      */
 
-    public void saveArticles(NewsResponse newsResponse){
-        if(newsResponse == null || newsResponse.getArticles().isEmpty()){
+    @Transactional
+    public void saveArticles(NewsResponse newsResponse) {
+        if (newsResponse == null || newsResponse.getArticles().isEmpty()) {
             throw new ArticleNotFoundException("no Articles were  found");
         }
 
-        for (Article article : newsResponse.getArticles()){
+        for (Article article : newsResponse.getArticles()) {
             News news = News.builder()
-                            .article(article)
-                                    .build();
+                    .article(article)
+                    .build();
             newsRepository.save(news);
         }
     }
@@ -120,11 +122,12 @@ public class NewsApiService {
 
     /**
      * allows us to fetch all the persisted news
+     *
      * @return a list of news objects
      */
-    public List<News> findAllNews(){
+    public List<News> findAllNews() {
         List<News> newsList = newsRepository.findAll();
-        if(newsList.isEmpty()){
+        if (newsList.isEmpty()) {
             throw new ArticleNotFoundException("no Articles were found");
         }
         return newsList;
@@ -133,29 +136,46 @@ public class NewsApiService {
 
 
     /**
-     *
-     * @param id - the id of the article the user wants to generate a blog from
+     * @param id  - the id of the article the user wants to generate a blog from
      * @param url - url pointing to the exact article which allows us to extract content
      * @return
      */
-    public void generateBlog(Long id, String url)throws IOException{
+    public String generateBlog(Long id, String url) {
         Optional<News> news = newsRepository.findById(id);
-        if(news.isEmpty()){
+        if (news.isEmpty()) {
             throw new ArticleNotFoundException("no Articles were found");
         }
         News retrieveNews = news.get();
 
-        if(retrieveNews.getArticle().getUrl().equals(url)) {
-            /// we need to pass the token and the url as query params to the api
-            String endpoint = "https://api.diffbot.com/v3/article?token=%s&url=%s".
-                    formatted(diffBotClient.getApiKey(), url);
-
-            /// handle the returned response from diffbot (already extracted the body)
-        try{
-            ResponseBody responseBody = diffBotClient.diffBotRequest(endpoint);
-
-
+        if (!retrieveNews.getArticle().getUrl().equals(url)) {
+            throw new RuntimeException("urls do not match");
         }
+
+
+        /// we need to pass the token and the url as query params to the api
+        String endpoint = "https://api.diffbot.com/v3/article?token=%s&url=%s".
+                formatted(diffBotClient.getApiKey(), url);
+
+        /// handle the returned response from diffbot (already extracted the body)
+        DiffBotResponse diffbotresponse;
+        try (ResponseBody responseBody = diffBotClient.diffBotRequest(endpoint)) {
+            ObjectMapper objectMapper = new ObjectMapper();
+            diffbotresponse = objectMapper.readValue(responseBody.string(), DiffBotResponse.class);
+
+
+            if (diffbotresponse.getObjects() != null && !diffbotresponse.getObjects().isEmpty()) {
+                DiffBotArticle article = diffbotresponse.getObjects().get(0);
+                /// only returns the text from the returned json
+                return article.getText();
+            } else {
+                throw new RuntimeException("response is either empty or null");
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("error occurred while diff bot");
+        }
+
+
     }
 
 

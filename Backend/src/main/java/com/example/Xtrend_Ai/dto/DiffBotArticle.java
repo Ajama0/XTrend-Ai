@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class DiffBotArticle {
     /// this returns the content of the page.
-    private String title;
+    private String text;
 }
