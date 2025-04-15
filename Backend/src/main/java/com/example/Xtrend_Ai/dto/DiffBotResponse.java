@@ -9,5 +9,5 @@ import java.util.List;
 @Data
 public class DiffBotResponse {
 
-    private List<DiffBotArticle> Objects;
+    private List<DiffBotArticle> objects;
 }

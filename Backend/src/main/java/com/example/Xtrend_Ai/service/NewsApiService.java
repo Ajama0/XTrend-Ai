@@ -39,7 +39,7 @@ public class NewsApiService {
 
     private final NewsRepository newsRepository;
     private final ApiClient apiClient;
-    private final DiffBotClient diffBotClient;
+    private final DiffBotService diffBotService;
 
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);
@@ -147,31 +147,15 @@ public class NewsApiService {
             throw new RuntimeException("urls do not match");
         }
 
+        /**
+         * once a user is ready to generate their blog, we can pass it to the diffBot serivce to extract content
+         */
+        String extractedText = diffBotService.extractTextFromArticle(url);
 
-        /// we need to pass the token and the url as query params to the api
-        String endpoint = "https://api.diffbot.com/v3/article?token=%s&url=%s".
-                formatted(diffBotClient.getApiKey(), url);
-
-        /// handle the returned response from diffbot (already extracted the body)
-        DiffBotResponse diffbotresponse;
-        try (ResponseBody responseBody = diffBotClient.diffBotRequest(endpoint)) {
-            log.info("diffbot response : {}", responseBody.string());
-            ObjectMapper objectMapper = new ObjectMapper();
-            diffbotresponse = objectMapper.readValue(responseBody.string(), DiffBotResponse.class);
-            log.info("converting th object to our pojo : {}", diffbotresponse.toString());
+        /// we can then pass this to GPTService to generate the blog.
+        return null;
 
 
-            if (diffbotresponse.getObjects() != null && !diffbotresponse.getObjects().isEmpty()) {
-                DiffBotArticle article = diffbotresponse.getObjects().get(0);
-                /// only returns the text from the returned json
-                return article.getText();
-            } else {
-                throw new RuntimeException("response is either empty or null");
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException("error occurred while requesting diff bot");
-        }
 
 
     }
