@@ -36,6 +36,8 @@ public class NewsApiService {
     private final ApiClient apiClient;
     private final DiffBotService diffBotService;
 
+    private GPTService gptService;
+
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);
 
@@ -131,7 +133,7 @@ public class NewsApiService {
      * @param url - url pointing to the exact article which allows us to extract content
      * @return text - represents extracted textual content from the url
      */
-    public String generateBlog(Long id, String url) {
+    public String generateBlog(Long id, String url, String username) {
         Optional<News> news = newsRepository.findById(id);
         if (news.isEmpty()) {
             throw new ArticleNotFoundException("no Articles were found");
@@ -142,13 +144,13 @@ public class NewsApiService {
             throw new RuntimeException("urls do not match");
         }
 
-        /**
-         * once a user is ready to generate their blog, we can pass it to the diffBot serivce to extract content
-         */
+
+         /// once a user is ready to generate their blog, we can pass it to the diffBot serivce to extract content
         String extractedText = diffBotService.extractTextFromArticle(url);
 
-        /// we can then pass this to GPTService to generate the blog.
-        return extractedText;
+        /// we can then pass the article content to GPTService alongside the username to generate the blog.
+        String blog = gptService.getGptResponse(extractedText,username);
+        return blog;
 
 
 

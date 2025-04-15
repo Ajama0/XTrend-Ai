@@ -80,7 +80,9 @@ public class GPTService {
 
     public String generatePrompt(String username){
         return """
-           Read the following article thoroughly. Based on its content, generate a detailed and engaging blog post while strictly staying within the article's topic. 
+           Read the following article thoroughly.
+            You are an expert blog writer. Based on the content of the article, 
+            generate a detailed and engaging blog post while strictly staying within the article's topic. 
            Follow these guidelines:
 
            1. Content Adaptation:
@@ -106,7 +108,7 @@ public class GPTService {
               - The entire blog must remain on topic and base its content solely on the article provided.
               - Do not introduce new topics or unrelated information.
 
-           The article will be provided to you by the user.
+           The article will be provided to you.
            
 
            """.formatted(username);
