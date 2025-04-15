@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class HttpClientConfig {
 
+
     @Bean
     public OkHttpClient DifBotHttpClient() {
         return new OkHttpClient();

@@ -23,10 +23,8 @@ public class DiffBotClient {
 
     @Value("${diffBot.api.key}")
     private String apiKey;
-    private final OkHttpClient client;
 
-    @Value("${diffBot_url}")
-    private String diffBotUrl;
+    private final OkHttpClient client;
 
 
     public DiffBotClient(@Qualifier("DifBotHttpClient")OkHttpClient client) {

@@ -11,6 +11,7 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.NewsUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
@@ -137,15 +138,24 @@ public class NewsApiService {
      * @param url - url pointing to the exact article which allows us to extract content
      * @return
      */
-    public T <T> generateBlog(Long id, String url){
+    public void generateBlog(Long id, String url)throws IOException{
         Optional<News> news = newsRepository.findById(id);
         if(news.isEmpty()){
             throw new ArticleNotFoundException("no Articles were found");
         }
-        /// we need to pass the token and the url to the method that makes our call to the diffbot api
+        News retrieveNews = news.get();
+
+        if(retrieveNews.getArticle().getUrl().equals(url)) {
+            /// we need to pass the token and the url as query params to the api
+            String endpoint = "https://api.diffbot.com/v3/article?token=%s&url=%s".
+                    formatted(diffBotClient.getApiKey(), url);
+
+            /// handle the returned response from diffbot (already extracted the body)
+        try{
+            ResponseBody responseBody = diffBotClient.diffBotRequest(endpoint);
 
 
-
+        }
     }
 
 
