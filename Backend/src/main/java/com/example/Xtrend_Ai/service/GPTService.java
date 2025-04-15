@@ -1,7 +1,17 @@
 package com.example.Xtrend_Ai.service;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class GPTService {
+
+    private final RestClient restClient;
+
+
+
 }

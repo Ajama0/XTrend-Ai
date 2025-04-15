@@ -7,6 +7,5 @@ import lombok.Data;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
 public class Choices {
-    private int index;
     private ChatMessage message;
 }
