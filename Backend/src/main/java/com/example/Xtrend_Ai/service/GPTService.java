@@ -68,7 +68,7 @@ public class GPTService {
         if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getChoices().isEmpty()){
             log.info("success");
             Choices returnedChoice = response.getBody().getChoices().get(0);
-            String messageResponse = returnedChoice.getMessages().getContent();
+            String messageResponse = returnedChoice.getMessage().getContent();
             return messageResponse;
 
         }else{
