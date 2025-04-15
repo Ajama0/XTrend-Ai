@@ -1,4 +1,4 @@
-package com.example.Xtrend_Ai.dto;
+package com.example.Xtrend_Ai.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

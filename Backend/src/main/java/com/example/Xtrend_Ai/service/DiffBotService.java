@@ -1,7 +1,7 @@
 package com.example.Xtrend_Ai.service;
 
 import com.example.Xtrend_Ai.client.DiffBot.DiffBotClient;
-import com.example.Xtrend_Ai.dto.DiffBotArticle;
+import com.example.Xtrend_Ai.utils.DiffBotArticle;
 import com.example.Xtrend_Ai.dto.DiffBotResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;

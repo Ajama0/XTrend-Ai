@@ -1,9 +1,6 @@
 package com.example.Xtrend_Ai.service;
-import com.example.Xtrend_Ai.client.DiffBot.DiffBotClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiService;
-import com.example.Xtrend_Ai.dto.DiffBotArticle;
-import com.example.Xtrend_Ai.dto.DiffBotResponse;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.Article;
@@ -11,11 +8,9 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.NewsUtils;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import okhttp3.ResponseBody;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
@@ -153,7 +148,7 @@ public class NewsApiService {
         String extractedText = diffBotService.extractTextFromArticle(url);
 
         /// we can then pass this to GPTService to generate the blog.
-        return null;
+        return extractedText;
 
 
 
