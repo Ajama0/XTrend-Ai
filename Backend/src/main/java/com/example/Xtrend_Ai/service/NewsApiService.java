@@ -36,7 +36,7 @@ public class NewsApiService {
     private final ApiClient apiClient;
     private final DiffBotService diffBotService;
 
-    private GPTService gptService;
+    private final GPTService gptService;
 
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);

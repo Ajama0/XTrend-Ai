@@ -64,8 +64,8 @@ public class NewsController {
     }
 
 
-    @GetMapping(path="generate/blog/{id}")
-    public ResponseEntity<?> generateBlogPost(@PathVariable("id")Long id, @RequestParam("url") String url,
+    @PostMapping(path="generate/blog/{id}")
+    public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id, @RequestParam("url") String url,
                                               @RequestParam("username")String username
                                               ){
         String text = newsApiService.generateBlog(id,url,username);
