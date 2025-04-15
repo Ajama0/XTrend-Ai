@@ -24,9 +24,8 @@ public class DiffBotClient {
     @Value("${diffBot.api.key}")
     private String apiKey;
 
+
     private final OkHttpClient client;
-
-
     public DiffBotClient(@Qualifier("DifBotHttpClient")OkHttpClient client) {
         this.client = client;
     }
@@ -51,6 +50,7 @@ public class DiffBotClient {
                 .build();
 
         Response response = client.newCall(request).execute();
+        log.info("made the request to diffbot and returning response");
         return response.body();
 
     }

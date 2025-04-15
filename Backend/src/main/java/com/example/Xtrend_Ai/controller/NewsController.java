@@ -18,10 +18,17 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("api/v1/news")
-@RequiredArgsConstructor
 public class NewsController {
 
     private final NewsApiService newsApiService;
+
+    public NewsController(NewsApiService newsApiService) {
+        this.newsApiService = newsApiService;
+    }
+
+
+
+
     @GetMapping(path="/")
     public void persistTrendingNews() {
         /**
@@ -39,7 +46,7 @@ public class NewsController {
                     @Override
                     public void onSuccess(NewsResponse newsResponse) {
                         /// handles how we save the articles
-                        newsApiService.saveArticles(newsResponse);
+                        newsApiService.saveNews(newsResponse);
                     }
 
                     @Override
@@ -60,9 +67,9 @@ public class NewsController {
     }
 
 
-    @GetMapping(path='generate/blog/')
+    @GetMapping(path="generate/blog")
     public ResponseEntity<?> generateBlogPost(@RequestParam("id")Long id, @RequestParam("url") String url){
-        Object object = newsApiService.generateBlog(id,url);
-        return new ResponseEntity<>(object, HttpStatus.OK);
+        String text = newsApiService.generateBlog(id,url);
+        return new ResponseEntity<>(text, HttpStatus.OK);
     }
 }

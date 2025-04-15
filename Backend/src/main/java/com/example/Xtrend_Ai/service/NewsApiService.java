@@ -31,19 +31,14 @@ import java.util.Optional;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-
 public class NewsApiService {
 
 
     @Value("${news.api}")
-    private String newsApi;
-
-    @Value("${d")
-
+    private String newsApiKey;
 
     private final NewsRepository newsRepository;
     private final ApiClient apiClient;
-    ApiService apiService = apiClient.getApiService();
     private final DiffBotClient diffBotClient;
 
     public interface ArticlesResponseCallback {
@@ -56,8 +51,8 @@ public class NewsApiService {
         /// here we use the api client to return an impl of the base ApiService.
 
 
-        log.info("api key is....{}", newsApi);
-        Map<String, String> query = NewsUtils.generateQuery(newsApi);
+        log.info("api key is....{}", newsApiKey);
+        Map<String, String> query = NewsUtils.generateQuery(newsApiKey);
 
         log.info("api key inside query is : {}", query.get("apiKey"));
         query.put("country", newsRequest.getCountry());
@@ -71,7 +66,8 @@ public class NewsApiService {
         query.values().removeAll(Collections.singleton(null));
         query.values().removeAll(Collections.singleton("null"));
 
-
+        /// returns the service class that has the impl of the get request
+        ApiService apiService = apiClient.getApiService();
         apiService.topHeadlines(query)
                 .enqueue(new Callback<NewsResponse>() {
                     @Override
@@ -106,7 +102,7 @@ public class NewsApiService {
      */
 
     @Transactional
-    public void saveArticles(NewsResponse newsResponse) {
+    public void saveNews(NewsResponse newsResponse) {
         if (newsResponse == null || newsResponse.getArticles().isEmpty()) {
             throw new ArticleNotFoundException("no Articles were  found");
         }
@@ -138,7 +134,7 @@ public class NewsApiService {
     /**
      * @param id  - the id of the article the user wants to generate a blog from
      * @param url - url pointing to the exact article which allows us to extract content
-     * @return
+     * @return text - represents extracted textual content from the url
      */
     public String generateBlog(Long id, String url) {
         Optional<News> news = newsRepository.findById(id);
@@ -159,8 +155,10 @@ public class NewsApiService {
         /// handle the returned response from diffbot (already extracted the body)
         DiffBotResponse diffbotresponse;
         try (ResponseBody responseBody = diffBotClient.diffBotRequest(endpoint)) {
+            log.info("diffbot response : {}", responseBody.string());
             ObjectMapper objectMapper = new ObjectMapper();
             diffbotresponse = objectMapper.readValue(responseBody.string(), DiffBotResponse.class);
+            log.info("converting th object to our pojo : {}", diffbotresponse.toString());
 
 
             if (diffbotresponse.getObjects() != null && !diffbotresponse.getObjects().isEmpty()) {
@@ -172,7 +170,7 @@ public class NewsApiService {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("error occurred while diff bot");
+            throw new RuntimeException("error occurred while requesting diff bot");
         }
 
 
