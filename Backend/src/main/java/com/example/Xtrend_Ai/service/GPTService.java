@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,19 +33,28 @@ public class GPTService {
     private String gptUrl;
 
 
-    public String getGptResponse(String prompt){
+    public String getGptResponse(String article, String username){
+
+        /// this is the prompt gpt uses to follow my instructions and add the user as the author
+        String developerPrompt = generatePrompt(username);
 
         /// build the message object
-        ChatMessage chatMessage = ChatMessage
+        ChatMessage developer = ChatMessage
+                .builder()
+                .role("developer")
+                .content(developerPrompt)
+                .build();
+
+        ChatMessage user = ChatMessage
                 .builder()
                 .role("user")
-                .content(prompt) /// passed in from generate Prompt method
+                .content(article)
                 .build();
 
         /// building the request object
         GPTRequest request = GPTRequest.builder()
                 .model("gpt-4o")
-                .messages(Collections.singletonList(chatMessage))
+                .messages(Arrays.asList(developer, user))
                 .build();
 
         ResponseEntity<GptResponse> response = restClient.post()
@@ -61,10 +71,14 @@ public class GPTService {
             String messageResponse = returnedChoice.getMessages().getContent();
             return messageResponse;
 
+        }else{
+            log.info("status code :{}", response.getStatusCode());
+            throw new RuntimeException("error has occurred");
+
         }
     }
 
-    public String generatePrompt(String articleContent, String username){
+    public String generatePrompt(String username){
         return """
            Read the following article thoroughly. Based on its content, generate a detailed and engaging blog post while strictly staying within the article's topic. 
            Follow these guidelines:
@@ -75,7 +89,7 @@ public class GPTService {
               - Ensure that the blog post reflects the key points and insights of the article.
 
            2. Length Considerations:
-              - Aim for a blog post of approximately 1,200 to 1,800 words.
+              - Aim for a blog post of approximately 1,500 to 2000 words.
               - Condense or expand the information as needed while preserving clarity and substance.
 
            3. Structural Elements:
@@ -92,10 +106,10 @@ public class GPTService {
               - The entire blog must remain on topic and base its content solely on the article provided.
               - Do not introduce new topics or unrelated information.
 
-           Here is the article content:
-           %s
+           The article will be provided to you by the user.
+           
 
-           """.formatted(username, articleContent);
+           """.formatted(username);
     }
 
 }
