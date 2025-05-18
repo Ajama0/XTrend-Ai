@@ -15,4 +15,6 @@ import java.util.List;
 public class GPTRequest {
     private String model;
     private List<ChatMessage> messages;
+    private double temperature;
+    private int max_tokens;
 }

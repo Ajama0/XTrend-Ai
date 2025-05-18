@@ -44,7 +44,7 @@ public class DiffBotClient {
 
     public ResponseBody diffBotRequest(String url) throws IOException {;
         Request request = new Request.Builder()
-                .url(url) /// the url will be specific article the user request plus it will include our token
+                .url(url) /// this is the url request to diffbot api including the api key and article to extract
                 .get()
                 .addHeader("accept", "application/json")
                 .build();

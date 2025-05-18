@@ -146,7 +146,9 @@ public class NewsApiService {
 
 
          /// once a user is ready to generate their blog, we can pass it to the diffBot serivce to extract content
+        /// Call Diffbot service
         String extractedText = diffBotService.extractTextFromArticle(url);
+        log.info("extracted texted");
 
         /// we can then pass the article content to GPTService alongside the username to generate the blog.
         String blog = gptService.getGptResponse(extractedText,username);

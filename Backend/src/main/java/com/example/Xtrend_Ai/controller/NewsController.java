@@ -4,6 +4,7 @@ package com.example.Xtrend_Ai.controller;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.News;
+import com.example.Xtrend_Ai.service.DiffBotService;
 import com.example.Xtrend_Ai.service.NewsApiService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,10 @@ import java.util.List;
 public class NewsController {
 
     private final NewsApiService newsApiService;
-
-    public NewsController(NewsApiService newsApiService) {
+    private final DiffBotService diffBotService;
+    public NewsController(NewsApiService newsApiService, DiffBotService diffBotService) {
         this.newsApiService = newsApiService;
+        this.diffBotService = diffBotService;
     }
 
 
@@ -64,11 +66,19 @@ public class NewsController {
     }
 
 
-    @PostMapping(path="generate/blog/{id}")
+    @GetMapping(path="generate/blog/{id}")
     public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id, @RequestParam("url") String url,
                                               @RequestParam("username")String username
                                               ){
         String text = newsApiService.generateBlog(id,url,username);
         return new ResponseEntity<>(text, HttpStatus.OK);
+    }
+
+
+    /// testing the diffbot API
+    @GetMapping(path="/extract")
+    public ResponseEntity<String> extractContent(@RequestParam("url")String url){
+        String extractedContent = diffBotService.extractTextFromArticle(url);
+        return new ResponseEntity<>(extractedContent, HttpStatus.OK);
     }
 }

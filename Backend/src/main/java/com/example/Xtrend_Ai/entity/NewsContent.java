@@ -16,6 +16,11 @@ import org.springframework.stereotype.Service;
 @ToString
 public class NewsContent {
 
+
+    /***
+     *    Entity represents the news content that is generated for each user
+     *
+     */
     @SequenceGenerator(sequenceName = "newsContent_sequence",
             name = "newsContent_sequence",
             allocationSize = 1

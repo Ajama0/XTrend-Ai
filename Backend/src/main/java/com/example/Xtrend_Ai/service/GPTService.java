@@ -36,15 +36,16 @@ public class GPTService {
     public String getGptResponse(String article, String username){
 
         /// this is the prompt gpt uses to follow my instructions and add the user as the author
-        String developerPrompt = generatePrompt(username);
+        String developerPrompt = generateBlogPrompt(username);
 
-        /// build the message object
+        /// this is the developer instruction prioritized ahead of the user prompt
         ChatMessage developer = ChatMessage
                 .builder()
-                .role("developer")
+                .role("system")
                 .content(developerPrompt)
                 .build();
 
+        /// llm uses the developer instruction to handle this prompt
         ChatMessage user = ChatMessage
                 .builder()
                 .role("user")
@@ -55,6 +56,8 @@ public class GPTService {
         GPTRequest request = GPTRequest.builder()
                 .model("gpt-4o")
                 .messages(Arrays.asList(developer, user))
+                .temperature(0.6)
+                .max_tokens(700)
                 .build();
 
         ResponseEntity<GptResponse> response = restClient.post()
@@ -68,8 +71,7 @@ public class GPTService {
         if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getChoices().isEmpty()){
             log.info("success");
             Choices returnedChoice = response.getBody().getChoices().get(0);
-            String messageResponse = returnedChoice.getMessage().getContent();
-            return messageResponse;
+            return returnedChoice.getMessage().getContent();
 
         }else{
             log.info("status code :{}", response.getStatusCode());
@@ -78,7 +80,7 @@ public class GPTService {
         }
     }
 
-    public String generatePrompt(String username){
+    public String generateBlogPrompt(String username){
         return """
            Read the following article thoroughly.
             You are an expert blog writer. Based on the content of the article, 
@@ -91,7 +93,7 @@ public class GPTService {
               - Ensure that the blog post reflects the key points and insights of the article.
 
            2. Length Considerations:
-              - Aim for a blog post of approximately 1,500 to 2000 words.
+              - Aim for a blog post of approximately 500 words.
               - Condense or expand the information as needed while preserving clarity and substance.
 
            3. Structural Elements:
@@ -112,6 +114,11 @@ public class GPTService {
            
 
            """.formatted(username);
+    }
+
+
+    public String generateVideoScriptPrompt(String content){
+        return null;
     }
 
 }
