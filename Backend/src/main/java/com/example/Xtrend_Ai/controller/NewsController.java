@@ -66,19 +66,5 @@ public class NewsController {
     }
 
 
-    @GetMapping(path="generate/blog/{id}")
-    public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id, @RequestParam("url") String url,
-                                              @RequestParam("username")String username
-                                              ){
-        String text = newsApiService.generateBlog(id,url,username);
-        return new ResponseEntity<>(text, HttpStatus.OK);
-    }
 
-
-    /// testing the diffbot API
-    @GetMapping(path="/extract")
-    public ResponseEntity<String> extractContent(@RequestParam("url")String url){
-        String extractedContent = diffBotService.extractTextFromArticle(url);
-        return new ResponseEntity<>(extractedContent, HttpStatus.OK);
-    }
 }
