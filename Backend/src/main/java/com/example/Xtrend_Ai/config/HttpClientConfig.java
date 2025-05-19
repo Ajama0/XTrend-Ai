@@ -28,4 +28,10 @@ public class HttpClientConfig {
     }
 
 
+    @Bean
+    public OkHttpClient HeyGen() {
+        return new OkHttpClient();
+    }
+
+
 }
