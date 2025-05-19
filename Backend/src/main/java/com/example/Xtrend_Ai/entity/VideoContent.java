@@ -26,11 +26,9 @@ public class VideoContent{
     @Id
     private Long id;
 
-    private URL videoUrl;
+    private Long video_id;
 
     private String videoTitle;
-
-    private String videoDescription;
 
 
     /***

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class BlogController {
 
     private final BlogService blogService;
-    privaet final DiffBotService diffBotService;
+    private final DiffBotService diffBotService;
 
 
     @GetMapping(path="generate/blog/{id}")

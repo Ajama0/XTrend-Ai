@@ -1,8 +1,9 @@
 package com.example.Xtrend_Ai.utils;
 
 import jakarta.persistence.Embeddable;
+import lombok.Data;
 
-@Embeddable
+@Data
 public class Dimension {
 
     private int width;
