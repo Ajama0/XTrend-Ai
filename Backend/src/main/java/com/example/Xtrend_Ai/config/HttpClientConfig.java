@@ -30,7 +30,11 @@ public class HttpClientConfig {
 
     @Bean
     public OkHttpClient HeyGen() {
-        return new OkHttpClient();
+        return new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(45, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .build();
     }
 
 

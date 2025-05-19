@@ -20,7 +20,7 @@
 //public abstract class Content {
 //
 //    /**
-//     * NewsContent and VideoContent represent the generated content associated with a user.
+//     * NewsContent and VideoContentRepository represent the generated content associated with a user.
 //     */
 //    @SequenceGenerator(sequenceName = "content_sequence",
 //            name = "content_sequence",

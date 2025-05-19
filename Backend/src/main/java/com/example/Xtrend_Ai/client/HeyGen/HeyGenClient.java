@@ -3,6 +3,7 @@ package com.example.Xtrend_Ai.client.HeyGen;
 import com.example.Xtrend_Ai.dto.HeyGenRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,6 +13,7 @@ import java.io.IOException;
 
 
 @Component
+@Slf4j
 public class HeyGenClient {
     @Value("${heygen.api}")
     private String apikey;
@@ -29,7 +31,6 @@ public class HeyGenClient {
      * @throws IOException
      */
     public Response ListOfAvatars()  throws IOException {
-        OkHttpClient client = new OkHttpClient();
 
         Request request = new Request.Builder()
                 .url("https://api.heygen.com/v2/avatars")
@@ -39,6 +40,7 @@ public class HeyGenClient {
                 .build();
 
         Response response = client.newCall(request).execute();
+        assert response.body() != null;
         return response;
 
 
@@ -57,6 +59,7 @@ public class HeyGenClient {
                 .build();
 
         Response response = client.newCall(request).execute();
+        return response;
     }
 
 

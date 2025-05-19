@@ -35,11 +35,11 @@ public class VideoContent{
      * each generated content will be associated with the news entity.
      */
     @ManyToOne
-    @JoinColumn(name = "news_id")
+    @JoinColumn(name = "news_id",   nullable = false)
     private News news;
 
     @ManyToOne
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name="user_id", nullable=false)
     private User user;
 
 }

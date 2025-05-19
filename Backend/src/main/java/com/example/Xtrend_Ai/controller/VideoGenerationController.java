@@ -25,7 +25,8 @@ public class VideoGenerationController {
 
     @PostMapping(path="/generate/{id}/{username}")
     public ResponseEntity<Void> generateVideo(@PathVariable("id") long id, @PathVariable("username") String username) {
-        new ResponseEntity<Void>(videoService.generateVideo(id, username), HttpStatus.CREATED);
+        videoService.generateVideo(id, username);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
@@ -36,7 +37,9 @@ public class VideoGenerationController {
 
     }
 
-    @GetMapping(path="/all/avatars")
+
+
+    @GetMapping(path="/all/voices")
     private ResponseEntity<VoiceResponse> fetchVoices(){
         VoiceResponse voiceResponse = videoService.fetchVoices();
         return new ResponseEntity<>(voiceResponse, HttpStatus.OK);

@@ -25,10 +25,6 @@ public class HeyGenRequest {
 
     private String title;
 
-    @JsonProperty("callback_id")
-    private String callbackId;
-
-
     private Dimension dimension;
 
     @JsonProperty("video_inputs")
