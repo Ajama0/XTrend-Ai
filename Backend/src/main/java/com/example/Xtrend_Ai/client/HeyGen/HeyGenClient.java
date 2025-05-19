@@ -23,16 +23,47 @@ public class HeyGenClient {
     }
 
 
-    public Response ListOfAvatars(String url) {
-        return null;
+    /***
+     *
+     * @return list of avatars in which users can choose from
+     * @throws IOException
+     */
+    public Response ListOfAvatars()  throws IOException {
+        OkHttpClient client = new OkHttpClient();
+
+        Request request = new Request.Builder()
+                .url("https://api.heygen.com/v2/avatars")
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("x-api-key", apikey)
+                .build();
+
+        Response response = client.newCall(request).execute();
+        return response;
 
 
     }
 
+    /**
+     * list of voices in which users can choose from
+     * @return Response which contains the Json data
+     */
+    public Response ListOfVoices() throws IOException {
+        Request request = new Request.Builder()
+                .url("https://api.heygen.com/v2/voices")
+                .get()
+                .addHeader("accept", "application/json")
+                .addHeader("x-api-key", apikey)
+                .build();
 
-    public Response ListOfVoices(String url) {
-    return null;
+        Response response = client.newCall(request).execute();
     }
+
+
+
+
+
+
     public Response GenerateVideo(HeyGenRequest heyGenRequest) throws IOException {
 
         ObjectMapper objectMapper = new ObjectMapper();
