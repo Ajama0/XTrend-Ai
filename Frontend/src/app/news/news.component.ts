@@ -53,6 +53,6 @@ export class NewsComponent implements OnInit{
     })
   }
 
-  
+  https://chicago.suntimes.com/horoscopes/2025/04/13/horoscopes-today-sunday-april-13-2025
   
 }
