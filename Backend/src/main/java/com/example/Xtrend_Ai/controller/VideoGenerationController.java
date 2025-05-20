@@ -50,12 +50,14 @@ public class VideoGenerationController {
     }
 
 
+
     @PostMapping(path="/callback")
     public ResponseEntity<String> HeyGenCallback(HeyGenWebhook heyGenWebhook ){
         return new ResponseEntity<>(videoService.RecieveVideo(heyGenWebhook), HttpStatus.CREATED);
 
-
-
     }
+
+
+
 
 }

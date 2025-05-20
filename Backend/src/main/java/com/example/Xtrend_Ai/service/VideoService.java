@@ -75,7 +75,7 @@ public class VideoService {
 
     }
 
-    public HeyGenResponse generateVideo(Long id, String username) throws IOException {
+    public void generateVideo(Long id, String username) throws IOException {
         /***
          * the workflow of generating a video consists of passing in the id of the trending news and the user to generate content
          * after validating the news object we pass the url to the DiffBot API which uses ML to scrape article content
@@ -168,8 +168,8 @@ public class VideoService {
 
     /**
      * we recieve a callback from heygen which includes the generated video including the status
-     * @param heyGenWebhook
-     * @return
+     * @param heyGenWebhook - the payload sent by heygen including video url and etc
+     * @return the video url
      */
     public String RecieveVideo(HeyGenWebhook heyGenWebhook) {
         /// where video_id == id from heygen
