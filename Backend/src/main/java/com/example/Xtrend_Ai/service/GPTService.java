@@ -30,10 +30,14 @@ public class GPTService {
     private String gptUrl;
 
 
-    public String getGptResponse(String article, String username){
-
-        /// this is the prompt gpt uses to follow my instructions and add the user as the author
-        String developerPrompt = generateBlogPrompt(username);
+    public String getGptResponse(String article, String username, Boolean videoScript){
+        String developerPrompt;
+        /// if its a video script prompt we use this function else if its a blog generation we use blog prompt
+        if(videoScript){
+            developerPrompt = generateVideoScriptPrompt();
+        }else {
+             developerPrompt = generateBlogPrompt(username);
+        }
 
         /// this is the developer instruction prioritized ahead of the user prompt
         ChatMessage developer = ChatMessage
@@ -122,8 +126,10 @@ public class GPTService {
     }
 
 
-    public String generateVideoScriptPrompt(String content){
-        return null;
+    public String generateVideoScriptPrompt(){
+        return """
+                
+                """;
     }
 
 }

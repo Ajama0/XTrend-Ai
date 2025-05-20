@@ -1,5 +1,6 @@
 package com.example.Xtrend_Ai.entity;
 
+import com.example.Xtrend_Ai.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,9 +27,13 @@ public class VideoContent{
     @Id
     private Long id;
 
-    private Long video_id;
+    private String video_id;
 
     private String videoTitle;
+
+    private String video_url;
+
+    private Float duration;
 
 
     /***
@@ -42,4 +47,6 @@ public class VideoContent{
     @JoinColumn(name="user_id", nullable=false)
     private User user;
 
+    @Enumerated(EnumType.STRING)
+    private Status status;
 }

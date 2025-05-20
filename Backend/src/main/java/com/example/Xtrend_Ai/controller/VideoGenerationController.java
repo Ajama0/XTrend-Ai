@@ -1,12 +1,15 @@
 package com.example.Xtrend_Ai.controller;
 
 import com.example.Xtrend_Ai.dto.AvatarResponse;
+import com.example.Xtrend_Ai.dto.HeyGenWebhook;
 import com.example.Xtrend_Ai.dto.VoiceResponse;
 import com.example.Xtrend_Ai.service.VideoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("api/v1/video")
@@ -24,7 +27,7 @@ public class VideoGenerationController {
      */
 
     @PostMapping(path="/generate/{id}/{username}")
-    public ResponseEntity<Void> generateVideo(@PathVariable("id") long id, @PathVariable("username") String username) {
+    public ResponseEntity<Void> generateVideo(@PathVariable("id") long id, @PathVariable("username") String username) throws IOException {
         videoService.generateVideo(id, username);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -43,6 +46,15 @@ public class VideoGenerationController {
     private ResponseEntity<VoiceResponse> fetchVoices(){
         VoiceResponse voiceResponse = videoService.fetchVoices();
         return new ResponseEntity<>(voiceResponse, HttpStatus.OK);
+
+    }
+
+
+    @PostMapping(path="/callback")
+    public ResponseEntity<String> HeyGenCallback(HeyGenWebhook heyGenWebhook ){
+        return new ResponseEntity<>(videoService.RecieveVideo(heyGenWebhook), HttpStatus.CREATED);
+
+
 
     }
 

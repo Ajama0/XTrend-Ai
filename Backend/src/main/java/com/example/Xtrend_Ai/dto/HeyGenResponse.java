@@ -2,10 +2,7 @@ package com.example.Xtrend_Ai.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Data
@@ -16,9 +13,13 @@ public class HeyGenResponse {
     @JsonProperty("data")
     private VideoResponse videoResponse;
 
-    @Data
+
     @Builder
-    private static class VideoResponse{
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Getter
+    @Setter
+    public static class VideoResponse{
         private String video_id;
     }
 }

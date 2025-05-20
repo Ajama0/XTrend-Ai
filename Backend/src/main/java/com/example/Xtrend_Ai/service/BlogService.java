@@ -42,7 +42,7 @@ public class BlogService {
         log.info("extracted texted");
 
         /// we can then pass the article content to GPTService alongside the username to generate the blog.
-        String blog = gptService.getGptResponse(extractedText,username);
+        String blog = gptService.getGptResponse(extractedText,username,false);
         return blog;
 
 
