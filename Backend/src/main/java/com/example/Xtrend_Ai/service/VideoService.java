@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.http.HttpClient;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -75,7 +76,7 @@ public class VideoService {
 
     }
 
-    public void generateVideo(Long id, String username) throws IOException {
+    public HeyGenResponse generateVideo(Long id, String username) throws IOException {
         /***
          * the workflow of generating a video consists of passing in the id of the trending news and the user to generate content
          * after validating the news object we pass the url to the DiffBot API which uses ML to scrape article content
@@ -97,10 +98,10 @@ public class VideoService {
         String videoScript = gptService.getGptResponse(extractedContent,null,true);
 
         VideoInputs.Voice voice = VideoInputs.Voice.builder()
-                .type("avatar")
+                .type("text")
                 .inputText(videoScript)
                 .voice_id(voicesId)
-                .speed(1.0)
+                .emotion("Broadcaster")
                 .build();
 
         VideoInputs.Character character = VideoInputs.Character.builder()
@@ -135,15 +136,17 @@ public class VideoService {
                 .title(fetchedNews.getArticle().getTitle())
                 .videoInputs(List.of(videoInputs))
                 .dimension(dimension)
-                .callbackUrl("")
+                .callbackUrl("https://72bb-195-170-186-6.ngrok-free.app/api/v1/video/callback")
                 .caption(true)
                 .build();
 
         /// we can now pass our heygen payload to the our client library
         HeyGenResponse heyGenResponse = new HeyGenResponse();
         Response response = heyGenClient.GenerateVideo(heyGenRequest);
+        String json = response.body().string();
+        log.info(json);
         if (response.code() == 200 && response.body() != null) {
-           heyGenResponse = objectMapper.readValue(response.body().string(), HeyGenResponse.class);
+           heyGenResponse = objectMapper.readValue(json, HeyGenResponse.class);
          /// using a callback this uses a webhook to send the video and status to our post request when video is generated
         /// we can save the video id to check the status later on
         }
@@ -157,11 +160,10 @@ public class VideoService {
                 .news(fetchedNews)
                 .user(fetchedUser)
                 .video_url("") /// default
-                .duration(10.00F) /// default
                 .status(Status.PENDING)
                 .build();
         videoContentRepository.save(videoContent);
-
+        return heyGenResponse;
 
         }
 
@@ -169,30 +171,31 @@ public class VideoService {
     /**
      * we recieve a callback from heygen which includes the generated video including the status
      * @param heyGenWebhook - the payload sent by heygen including video url and etc
-     * @return the video url
+     * @return log the video url, as the callback is processed.
      */
-    public String RecieveVideo(HeyGenWebhook heyGenWebhook) {
+    public void RecieveVideo(HeyGenWebhook heyGenWebhook) {
         /// where video_id == id from heygen
         VideoContent getVideo = videoContentRepository.findVideoContentByVideoId(
-                heyGenWebhook.getWebhookData().getId()).orElseThrow(()-> new RuntimeException("video record was not found"));
+                heyGenWebhook.getWebhookData().getVideo_id()).orElseThrow(()-> new RuntimeException("video record was not found"));
 
 
 
         log.info("payload: {}", heyGenWebhook.getWebhookData());
-        String videoUrl = heyGenWebhook.getWebhookData().getVideo_url();
-        String status = heyGenWebhook.getWebhookData().getStatus();
+        String videoUrl = heyGenWebhook.getWebhookData().getUrl();
 
-        if(status == "completed" && !videoUrl.isEmpty()){
+        if(videoUrl.isEmpty()){
             /// update our record by persisting the video url and updating the status
             getVideo.setVideo_url(videoUrl);
             getVideo.setStatus(Status.COMPLETED);
-            getVideo.setDuration(heyGenWebhook.getWebhookData().getDuration());
             videoContentRepository.save(getVideo);
+            log.info("video url: {}", videoUrl);
 
-            return videoUrl;
+
         }else{
             throw new RuntimeException("video status was either not completed or video was empty");
         }
+
+
 
 
     }

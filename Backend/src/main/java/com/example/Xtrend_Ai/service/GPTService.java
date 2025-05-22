@@ -34,6 +34,7 @@ public class GPTService {
         String developerPrompt;
         /// if its a video script prompt we use this function else if its a blog generation we use blog prompt
         if(videoScript){
+            log.info("generating video script");
             developerPrompt = generateVideoScriptPrompt();
         }else {
              developerPrompt = generateBlogPrompt(username);
@@ -55,9 +56,9 @@ public class GPTService {
 
         /// building the request object
         GPTRequest request = GPTRequest.builder()
-                .model("gpt-3.5-turbo")
+                .model("gpt-4o")
                 .messages(Arrays.asList(developer, user))
-                .temperature(0.6)
+                .temperature(0.5)
                 .max_tokens(700)
                 .build();
 
@@ -90,6 +91,7 @@ public class GPTService {
             You are an expert blog writer. Based on the content of the article,
             generate a detailed and engaging blog post while strictly staying within the article's topic.
            Follow these guidelines:
+           Do not echo the instructions back. Only output the final narration script.
 
            1. Content Adaptation:
               - Adjust the tone to be conversational and relatable for a blog audience.
@@ -127,8 +129,25 @@ public class GPTService {
 
 
     public String generateVideoScriptPrompt(){
+
+        /// instructions we give our LLM to generate a video script based on the trending news.
         return """
+                You are a professional broadcast‐news scriptwriter creating a narration script for a presenter.
+                Given a factual news article, produce a clear, engaging, and human-sounding video script—word-for-word—for a clip up to 3 minutes long (roughly 450 words max).
                 
+                Do not echo the instructions back. Only output the final narration script.
+                
+                Your script must:
+                1. Open with a strong, attention-grabbing hook in 1–2 sentences.
+                2. Accurately relay the key facts, data, and quotes in logical order.
+                3. Use smooth, spoken-style transitions (“Next…,” “Meanwhile…,” etc.).
+                4. Maintain an energetic yet authoritative tone.
+                5. You may include a brief personal insight or perspective, so long as it’s directly tied to the topic and factually sound (no unfounded opinions).
+                6. Stay strictly on topic—do not introduce outside information.
+                7. Write complete, conversational sentences (no bullet lists).
+                8. Close with a concise wrap-up line reinforcing the main takeaway.
+                
+                The article will be provided to you.
                 """;
     }
 

@@ -15,7 +15,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class HeyGenWebhook {
-    @JsonProperty("data")
+
+    @JsonProperty("event_type")
+    private String eventType;
+    @JsonProperty("event_data")
     private WebhookData webhookData;
 
 
@@ -24,14 +27,10 @@ public class HeyGenWebhook {
     @NoArgsConstructor
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class WebhookData {
+        private String video_id;
+        private String url;
         private String callback_id;
-        private String caption_url;
-        private Float duration;
-        private String id;
-        private String status;
-        private String gif_url;
-        private String video_url;
-        private String thumbnail_url;
-        private String video_url_caption;
+        private String video_share_page_url;
+        private String gif_download_url;
     }
 }

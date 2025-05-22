@@ -43,7 +43,7 @@ public class VideoInputs {
         @JsonProperty("input_text")
         private String inputText;
         private String voice_id;
-        private Double speed;
+        private String emotion;
 
     }
 

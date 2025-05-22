@@ -21,24 +21,20 @@ public class BlogService {
 
     /**
      * @param id  - the id of the article the user wants to generate a blog from
-     * @param url - url pointing to the exact article which allows us to extract content
      * @return text - represents extracted textual content from the url
      */
-    public String generateBlog(Long id, String url, String username) {
+    public String generateBlog(Long id, String username) {
         Optional<News> news = newsRepository.findById(id);
         if (news.isEmpty()) {
             throw new ArticleNotFoundException("no Articles were found");
         }
         News retrieveNews = news.get();
 
-        if (!retrieveNews.getArticle().getUrl().equals(url)) {
-            throw new RuntimeException("urls do not match");
-        }
 
 
         /// once a user is ready to generate their blog, we can pass it to the diffBot serivce to extract content
         /// Call Diffbot service
-        String extractedText = diffBotService.extractTextFromArticle(url);
+        String extractedText = diffBotService.extractTextFromArticle(retrieveNews.getArticle().getUrl());
         log.info("extracted texted");
 
         /// we can then pass the article content to GPTService alongside the username to generate the blog.

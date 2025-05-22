@@ -21,7 +21,7 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class HeyGenRequest {
 
-    private Boolean caption;
+    private boolean caption;
 
     private String title;
 

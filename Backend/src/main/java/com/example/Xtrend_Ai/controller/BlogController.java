@@ -17,10 +17,10 @@ public class BlogController {
 
 
     @GetMapping(path="generate/blog/{id}")
-    public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id, @RequestParam("url") String url,
+    public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id,
                                                    @RequestParam("username")String username
     ){
-        String text = blogService.generateBlog(id,url,username);
+        String text = blogService.generateBlog(id,username);
         return new ResponseEntity<>(text, HttpStatus.OK);
     }
 

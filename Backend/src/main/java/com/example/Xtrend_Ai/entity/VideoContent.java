@@ -33,7 +33,6 @@ public class VideoContent{
 
     private String video_url;
 
-    private Float duration;
 
 
     /***
