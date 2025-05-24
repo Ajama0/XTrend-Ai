@@ -1,16 +1,18 @@
-import dotenv
 from dotenv import load_dotenv
 from podcastfy.client import generate_podcast
 from IPython.display import Audio, display
 import os
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 
 
 trending_news_config= {
-    'conversation_style': ['Engaging', 'Fast-paced', 'Enthusiastic', 'Educational'], 
+    'conversation_style': ['Engaging', 'informative', 'Enthusiastic', 'Educational'], 
     'roles_person1': 'main summarizer', 
     'roles_person2': 'Subject matter expert', 
     'dialogue_structure': ['Topic Introduction', 'Summary of Key Points', 'Discussions', 'Q&A Session', 'Farewell Messages'], 
-    'podcast_name': 'XTrend Ai', 
+    'podcast_name': 'XTrends', 
     'podcast_tagline': 'Your very own podcast catered to the current trending topics ', 
     'output_language': 'English', 
     'user_instructions': 'Make if fun and engaging', 
@@ -19,39 +21,61 @@ trending_news_config= {
 }
 
 
-
-def embed_audio(audio_file):
-	"""
-	Embeds an audio file in the notebook, making it playable.
-
-	Args:
-		audio_file (str): Path to the audio file.
-	"""
-	try:
-		display(Audio(audio_file))
-		print(f"Audio player embedded for: {audio_file}")
-	except Exception as e:
-		print(f"Error embedding audio: {str(e)}")
-		
+app = Flask(__name__)
+CORS(app)
+load_dotenv()
 
 
+trending_news_config = {
+    'conversation_style': ['Engaging', 'Fast-paced'],
+    'roles_person1': 'main summarizer',
+    'roles_person2': 'subject matter expert',
+    'dialogue_structure': ['Intro', 'Discussion', 'Outro'],
+    'podcast_name': 'XTrends',
+    'podcast_tagline': 'Trendy podcasts on demand',
+    'output_language': 'English',
+    'user_instructions': 'Make it fun',
+    'engagement_techniques': ['Quotes', 'Humor'],
+    'creativity': 0.75
+}
 
-"""
-use topic as parameter if url isnt good.
 
-"""
+@app.route('/', methods=['GET'])
+def health_check():
+    """Health check endpoint"""
+    return jsonify({"status": "Flask app is runningggg!"})
 
 
-if __name__ == "__main__":
-    load_dotenv()
+
+
+@app.route('/generate-podcast', methods=['POST'])
+def generate():
+    print("in function -----------------")
+    data = request.json.get("data")
+    url = data.get("url")
+
+    print("data recieved", data)
+
     OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-	
-    audio_file = generate_podcast(
-	urls=["https://www.businessinsider.com/tesla-showroom-design-architecture-marketing-perfect-targets-elon-musk-protests-2025-4"],
-	tts_model="openai",
-	longform=False, 
-	conversation_config=trending_news_config,
-	api_key_label=OPENAI_KEY
-	)   
-    # Embed the audio file generated from transcript
-    embed_audio(audio_file)
+    audio_path = generate_podcast(
+        urls=[url],
+        tts_model="openai",
+        longform=False,
+        conversation_config=trending_news_config,
+        api_key_label=OPENAI_KEY
+    )
+
+    print("Returned audio path:", audio_path)
+
+    generated_audio = os.path.join("data","audio")
+    return jsonify({
+        "data": {
+            "audio": audio_path
+        }
+    }
+    )
+
+if __name__ == '__main__':
+    app.run(port=8000, debug=True)
+
+
