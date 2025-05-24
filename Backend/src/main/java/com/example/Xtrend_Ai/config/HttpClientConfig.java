@@ -38,4 +38,16 @@ public class HttpClientConfig {
     }
 
 
+    @Bean
+    public OkHttpClient Podcast() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(15, TimeUnit.SECONDS)
+                .readTimeout(45, TimeUnit.SECONDS)
+                .writeTimeout(15, TimeUnit.SECONDS)
+                .build();
+    }
+    }
+
+
+
 }

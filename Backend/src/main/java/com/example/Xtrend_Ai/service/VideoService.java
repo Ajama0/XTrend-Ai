@@ -190,6 +190,8 @@ public class VideoService {
             videoContentRepository.save(getVideo);
             log.info("video url: {}", videoUrl);
 
+            /// we can use polling in the frontend to repeatedly check the video status in our db
+
 
         }else{
             throw new RuntimeException("video status was either not completed or video was empty");
