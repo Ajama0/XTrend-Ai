@@ -1,12 +1,13 @@
 package com.example.Xtrend_Ai.service;
 import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
 import com.example.Xtrend_Ai.client.NewsApi.ApiService;
+import com.example.Xtrend_Ai.dto.ArticleResponse;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
-import com.example.Xtrend_Ai.entity.Article;
 import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
+import com.example.Xtrend_Ai.utils.Article;
 import com.example.Xtrend_Ai.utils.NewsUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -34,9 +35,8 @@ public class NewsApiService {
 
     private final NewsRepository newsRepository;
     private final ApiClient apiClient;
-    private final DiffBotService diffBotService;
 
-    private final GPTService gptService;
+
 
     public interface ArticlesResponseCallback {
         void onSuccess(NewsResponse newsResponse);
@@ -66,7 +66,7 @@ public class NewsApiService {
         /// returns the service class that has the impl of the get request
         ApiService apiService = apiClient.getApiService();
         apiService.topHeadlines(query)
-                .enqueue(new Callback<NewsResponse>() {
+                .enqueue(new Callback<>() {
                     @Override
                     public void onResponse(Call<NewsResponse> call, retrofit2.Response<NewsResponse> response) {
                         if (response.code() == HttpURLConnection.HTTP_OK) {
@@ -126,6 +126,7 @@ public class NewsApiService {
         return newsList;
 
     }
+
 
 
 

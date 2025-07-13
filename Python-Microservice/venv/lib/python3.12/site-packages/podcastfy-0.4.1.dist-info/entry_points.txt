@@ -1,0 +1,3 @@
+[console_scripts]
+build_docs=build_docs:main
+

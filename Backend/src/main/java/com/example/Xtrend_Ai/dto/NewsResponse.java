@@ -1,6 +1,7 @@
 package com.example.Xtrend_Ai.dto;
 
-import com.example.Xtrend_Ai.entity.Article;
+
+import com.example.Xtrend_Ai.utils.Article;
 import lombok.*;
 
 import java.util.List;

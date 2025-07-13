@@ -1,6 +1,7 @@
 package com.example.Xtrend_Ai.controller;
 
 
+import com.example.Xtrend_Ai.dto.ArticleResponse;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.News;
@@ -66,5 +67,8 @@ public class NewsController {
     }
 
 
-
 }
+
+
+
+

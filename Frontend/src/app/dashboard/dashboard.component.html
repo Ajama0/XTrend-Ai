@@ -1,1 +1,57 @@
-<p>dashboard works!</p>
+<!-- dashboard.component.html -->
+<div class="min-h-screen bg-gray-50">
+    <!-- Navbar -->
+    <nav class="flex items-center justify-between px-8 py-4 bg-white shadow-sm">
+      <div class="flex items-center gap-10">
+        <a routerLink="/" class="text-xl font-bold text-gray-900 hover:cursor-pointer">XTrend Ai</a>
+        <ul class="flex gap-6 text-sm font-medium text-gray-700">
+          <li class="hover:text-black cursor-pointer">Home</li>
+          <li class="hover:text-black cursor-pointer">Explore</li>
+          <li class="hover:text-black cursor-pointer">Create</li>
+        </ul>
+      </div>
+  
+      <div class="flex items-center gap-4">
+        <!-- Search Box -->
+        <div class="flex items-center bg-gray-100 px-4 py-2 rounded-lg text-gray-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 6.65a7.5 7.5 0 010 10.6z" />
+          </svg>
+          <input placeholder="Search" class="bg-transparent outline-none" />
+        </div>
+  
+        <!-- Notification Icon -->
+        <button class="p-2 bg-gray-100 rounded-full">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+          </svg>
+        </button>
+  
+        <!-- Profile Avatar -->
+        <img src="https://randomuser.me/api/portraits/women/79.jpg" alt="User" class="w-10 h-10 rounded-full object-cover" />
+      </div>
+    </nav>
+  
+    <!-- Main Content -->
+    <div class="px-8 pt-10">
+      <!-- Trending News Heading -->
+      <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-900">Trending News</h2>
+        <p class="text-sm text-gray-500">Explore the latest news and create content</p>
+      </div>
+  
+      <!-- Fetch Trending Articles -->
+      <app-news (articlesEmitted)="receiveArticles($event)"></app-news>
+  
+      <!-- Render Each Article as a Card -->
+      <div *ngFor="let article of dashboardArticles">
+        <app-news
+          [title]="article.title || ''"
+          [description]="article.description || ''"
+          [image]="article.urlToImage || ''"
+          [url]="article.url"
+        ></app-news>
+      </div>
+    </div>
+  </div>
+  

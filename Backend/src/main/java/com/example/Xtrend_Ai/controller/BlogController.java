@@ -7,6 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RequestMapping(path="api/v1/blog")
 @RestController
 @RequiredArgsConstructor
@@ -17,11 +20,13 @@ public class BlogController {
 
 
     @GetMapping(path="generate/blog/{id}")
-    public ResponseEntity<String> generateBlogPost(@PathVariable("id")Long id,
-                                                   @RequestParam("username")String username
+    public ResponseEntity<Map<String,String>>generateBlogPost(@PathVariable("id")Long id,
+                                                              @RequestParam("username")String username
     ){
         String text = blogService.generateBlog(id,username);
-        return new ResponseEntity<>(text, HttpStatus.OK);
+        Map<String,String> map = new HashMap<>();
+        map.put("blog",text);
+        return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
 

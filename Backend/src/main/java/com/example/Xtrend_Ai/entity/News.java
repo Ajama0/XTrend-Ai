@@ -1,6 +1,7 @@
 package com.example.Xtrend_Ai.entity;
 
 import com.example.Xtrend_Ai.enums.Types;
+import com.example.Xtrend_Ai.utils.Article;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;

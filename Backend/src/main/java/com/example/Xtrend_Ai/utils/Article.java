@@ -1,7 +1,7 @@
 package com.example.Xtrend_Ai.utils;
 
 
-import com.example.Xtrend_Ai.entity.Source;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;

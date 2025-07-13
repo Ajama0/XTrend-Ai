@@ -26,7 +26,7 @@ export class LoginComponent implements OnInit{
     //this runs as soon as the component is instatiated and the constructor is resolved
     //this.testerMethod()
     this.formStructure()
-    this.fetchTestUserCredentials()
+    //this.fetchTestUserCredentials()
   }
 
   constructor(private user:UserService, private formBuilder:FormBuilder, private router:Router){}
@@ -66,6 +66,12 @@ export class LoginComponent implements OnInit{
     })
   }
 
+  Homepage(){
+    this.router.navigate(['/dashboard'])
+
+
+  }
+
   //on form submission this is called. 
   validateForm(){
     if(this.userReturned && this.loginForm.valid){
@@ -86,6 +92,7 @@ export class LoginComponent implements OnInit{
     }
     
   }
+
 
 
 

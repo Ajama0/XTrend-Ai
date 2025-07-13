@@ -4,6 +4,7 @@ from IPython.display import Audio, display
 import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask import send_from_directory
 
 
 
@@ -65,15 +66,23 @@ def generate():
         api_key_label=OPENAI_KEY
     )
 
-    print("Returned audio path:", audio_path)
 
-    generated_audio = os.path.join("data","audio")
+    print("audio path", audio_path)
+    filename = os.path.basename(audio_path)
+    public_url = f"http://localhost:8000/audio/{filename}"
+    
+    
+
     return jsonify({
         "data": {
-            "audio": audio_path
+            "audio": public_url
         }
-    }
-    )
+    })
+    
+
+@app.route('/audio/<filename>')
+def serve_audio(filename):
+    return send_from_directory("data/audio", filename)
 
 if __name__ == '__main__':
     app.run(port=8000, debug=True)

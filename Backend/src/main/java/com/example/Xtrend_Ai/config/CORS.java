@@ -19,7 +19,7 @@ public class CORS implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins(String.valueOf(Arrays.asList("http://localhost:49220/", "http://localhost:8000/")))
+                .allowedOrigins("http://localhost:49220/")
                 .allowCredentials(true)
                 .allowedHeaders("*");
     }

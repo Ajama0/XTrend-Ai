@@ -2,18 +2,18 @@ export interface Articles{
 
 
     source ?: Source
-    author ?:String
-    title ?:String
-    description ?: String
-    url ?: String
-    urlToImage ?: String 
-    publishedAt ?: String
-    content ?: String
-    
+    author ?:string
+    title :string
+    description : string
+    url : string
+    urlToImage : string 
+    publishedAt ?: string
+    content ?: string
+  
    
 }
 
 export interface Source{
-    id : String
-    name : String
+    id : string
+    name : string
 }
