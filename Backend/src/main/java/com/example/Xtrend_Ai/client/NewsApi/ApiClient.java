@@ -33,23 +33,15 @@ public class ApiClient {
 
     /**
      * this allows us to make the api call to news api using our client whilst also passing in a set of queries
-     * @param queries - set of queries that are passed in the get request
-     * @return response body which will be desearlizied into a NewsResponse
+     * @param url- set of queries that are passed in the get request
+     * @return response body which will be deserialized into a NewsResponse
      * @throws IOException
      */
-    public ResponseBody fetchTopStories(Map<String,String>queries) throws IOException {
-        HttpUrl.Builder urlBuilder = Objects.requireNonNull(HttpUrl.parse(queries.get("url"))).newBuilder()
-                .addQueryParameter("api_key", queries.get("api_key"))
-                .addQueryParameter("locale", queries.get("locale"))
-                .addQueryParameter("page", queries.get("page"))
-                .addQueryParameter("published_on", queries.get("published_on"))
-                .addQueryParameter("language", queries.get("language"))
-                .addQueryParameter("category", queries.get("category"));
-
-        String url = urlBuilder.build().toString();
+    public ResponseBody fetchTopStories(HttpUrl url) throws IOException {
 
         Request request = new Request.Builder()
                 .url(url)
+                .get()
                 .build();
 
         Call call = Client.newCall(request);

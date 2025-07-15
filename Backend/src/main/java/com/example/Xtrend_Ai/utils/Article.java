@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.utils;
 
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -10,47 +11,38 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Embeddable
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Article {
 
 
-    @Embedded
-    @AttributeOverrides({
-            @AttributeOverride(name = "id", column = @Column(name = "source_id")),
-            @AttributeOverride(name = "name", column = @Column(name = "source_name"))
-    })
-    private Source source;
-
-    @JsonProperty("author")
-    private String author;
-
-    @JsonProperty("title")
-    @Lob
+    private String uuid;
     private String title;
-
-
-    @JsonProperty("description")
-    @Lob
     private String description;
-
-    @JsonProperty("url")
-    @Lob
+    private String keywords;
+    private String snippet;
     private String url;
 
+    @JsonProperty("image_url")
+    private String imageUrl;
+    private String language;
 
-    @JsonProperty("urlToImage")
-    @Lob
-    private String urlToImage;
+    @JsonProperty("published_at")
 
-    @JsonProperty("publishedAt")
     private String publishedAt;
+    private String source;
+    private List<String> categories;
 
-    @JsonProperty("content")
-    @Lob
-    private String content;
+    @JsonProperty("relevance_score")
+    private Double relevanceScore;
+
+    private String locale;
+
 }

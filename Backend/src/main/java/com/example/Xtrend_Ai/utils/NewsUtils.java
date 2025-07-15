@@ -8,8 +8,8 @@ import java.util.Map;
 
 public class NewsUtils {
 
-    public static Map<String,String> generateQuery(String apiKey){
-        Map<String,String> query = new HashMap<>();
+    public static Map<String,Object> generateQuery(String apiKey){
+        Map<String,Object> query = new HashMap<>();
         query.put("apiKey",apiKey);
         return query;
     }

@@ -11,54 +11,41 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 @Slf4j
 @RestController
+@EnableScheduling
 @RequestMapping("api/v1/news")
 public class NewsController {
 
     private final NewsApiService newsApiService;
-    private final DiffBotService diffBotService;
     public NewsController(NewsApiService newsApiService, DiffBotService diffBotService) {
         this.newsApiService = newsApiService;
-        this.diffBotService = diffBotService;
     }
 
 
 
 
     @GetMapping(path="/")
-    public void persistTrendingNews() {
+    public ResponseEntity<List<NewsResponse>> persistTrendingNews() {
         /**
-         * the news request object is what we pass in to make the call to the api
-         * we can define query parameters that we need. null parameters are not considered
          *
+         * we can define query parameters that we need when making the call to the news api
          */
-        NewsRequest newsRequest = NewsRequest.builder()
-                .language("en")
-                .country("us")
-                .build();
+        List<NewsResponse> response = newsApiService.getTopHeadlines();
+        return new ResponseEntity<>(response, HttpStatus.OK);
 
-        newsApiService.getTopHeadlines(newsRequest,
-                new NewsApiService.ArticlesResponseCallback() {
-                    @Override
-                    public void onSuccess(NewsResponse newsResponse) {
-                        /// handles how we save the articles
-                        newsApiService.saveNews(newsResponse);
-                    }
-
-                    @Override
-                    public void onFailure(String error) {
-                        log.error(error);
-
-                    }
-                }
-        );
 
     }
 
+
+    /**
+     * This allows us to make the call to the DB once the articles have been persisted.
+     * @return
+     */
     @GetMapping(path="all/articles")
     public ResponseEntity<List<News>> getAllTrendingNews() {
         List<News> trending = newsApiService.findAllNews();
