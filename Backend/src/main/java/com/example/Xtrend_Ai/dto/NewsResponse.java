@@ -22,4 +22,5 @@ public class NewsResponse {
     private int totalResults;
     /// this will be mapped when deserializing
     private List<Article> results;
+    private String nextPage;
 }

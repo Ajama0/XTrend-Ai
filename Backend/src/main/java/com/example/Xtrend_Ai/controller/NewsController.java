@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 @Slf4j
 @RestController
@@ -27,34 +28,43 @@ public class NewsController {
     }
 
 
+    @GetMapping(path="/trending")
+    public ResponseEntity<NewsResponse> getTrendingNews() throws IOException {
+        NewsResponse newsResponse = newsApiService.getNews();
+        return new ResponseEntity<>(newsResponse, HttpStatus.OK);
+
+    }
 
 
-    @GetMapping(path="/")
-    public ResponseEntity<List<NewsResponse>> persistTrendingNews() {
+//    @GetMapping(path="/")
+//    public ResponseEntity<List<NewsResponse>> persistTrendingNews() {
+//        /**
+//         *
+//         * we can define query parameters that we need when making the call to the news api
+//         */
+//        List<NewsResponse> response = newsApiService.getTopHeadlines();
+//        return new ResponseEntity<>(response, HttpStatus.OK);
+//
+//
+//    }
+
+
         /**
-         *
-         * we can define query parameters that we need when making the call to the news api
+         * This allows us to make the call to the DB once the articles have been persisted.
+         * @return
          */
-        List<NewsResponse> response = newsApiService.getTopHeadlines();
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        @GetMapping(path = "all/articles")
+        public ResponseEntity<List<News>> getAllTrendingNews () {
+            List<News> trending = newsApiService.findAllNews();
+            return ResponseEntity.ok(trending);
+
+        }
 
 
     }
 
 
-    /**
-     * This allows us to make the call to the DB once the articles have been persisted.
-     * @return
-     */
-    @GetMapping(path="all/articles")
-    public ResponseEntity<List<News>> getAllTrendingNews() {
-        List<News> trending = newsApiService.findAllNews();
-        return ResponseEntity.ok(trending);
 
-    }
-
-
-}
 
 
 

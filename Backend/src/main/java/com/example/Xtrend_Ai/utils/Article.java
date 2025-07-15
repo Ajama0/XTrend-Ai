@@ -27,15 +27,19 @@ public class Article {
     private String article_id;
     private String title;
 
-
+    @ElementCollection
     private List<String> keywords;
-    private String description;
 
-    private String content;
+
+
+    @Lob
     private String link;
 
+    @Lob
     private String image_url;
 
+    @Lob
+    private String description;
 
     private String source_id;
     private String source_name;
@@ -45,10 +49,14 @@ public class Article {
     private String pubDate;
 
     private String language;
+
+    @ElementCollection
     private List<String>country;
+
+    @ElementCollection
     private List<String> category;
 
-    private String sentiment;
+
 
 
 
