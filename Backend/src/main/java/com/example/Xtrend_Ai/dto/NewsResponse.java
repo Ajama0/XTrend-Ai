@@ -18,6 +18,8 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class NewsResponse {
 
+    private String status;
+    private int totalResults;
     /// this will be mapped when deserializing
-    private List<Article> data;
+    private List<Article> results;
 }

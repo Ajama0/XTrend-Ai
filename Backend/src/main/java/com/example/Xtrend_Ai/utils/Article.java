@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 
@@ -23,26 +24,36 @@ import java.util.List;
 public class Article {
 
 
-    private String uuid;
+    private String article_id;
     private String title;
+
+
+    private List<String> keywords;
     private String description;
-    private String keywords;
-    private String snippet;
-    private String url;
 
-    @JsonProperty("image_url")
-    private String imageUrl;
+    private String content;
+    private String link;
+
+    private String image_url;
+
+
+    private String source_id;
+    private String source_name;
+    private String source_icon;
+    private String source_url;
+
+    private String pubDate;
+
     private String language;
+    private List<String>country;
+    private List<String> category;
 
-    @JsonProperty("published_at")
+    private String sentiment;
 
-    private String publishedAt;
-    private String source;
-    private List<String> categories;
 
-    @JsonProperty("relevance_score")
-    private Double relevanceScore;
 
-    private String locale;
+
+
+
 
 }
