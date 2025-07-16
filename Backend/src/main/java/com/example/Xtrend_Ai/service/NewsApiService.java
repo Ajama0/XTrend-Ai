@@ -74,7 +74,7 @@ public class NewsApiService {
 
 
 
-    @Scheduled(fixedDelay = 1000 * 60 * 2)
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
     @Async
     public void defineBase() throws IOException {
         log.info("running now");
@@ -90,6 +90,10 @@ public class NewsApiService {
     //TODO recusrive function
 
     public void GetLatestNews(HttpUrl baseUrl, String nextPage, int requestCount) throws IOException {
+        log.info("inside recursive function");
+
+
+
 
         /// here we use the api client to return an impl of the base ApiService.
         NewsRequest newsRequest = NewsRequest
@@ -118,7 +122,7 @@ public class NewsApiService {
 
         /// the intiial call we will set nextPage to null
         if (nextPage != null && !nextPage.isEmpty()) {
-            builder.addQueryParameter("nextpage", nextPage);
+            builder.addQueryParameter("page", nextPage);
         }
 
 
@@ -126,14 +130,15 @@ public class NewsApiService {
         /// we can make the request, handle the processing of response and also fetch the next page string
         ResponseBody responseBody = apiClient.fetchTopStories(url);
         String body = responseBody.string();
+        log.error("body {}", body);
         NewsResponse newsResponse = objectMapper.readValue(body, NewsResponse.class);
+        log.info("newsResponse after deserializing{}", newsResponse.toString());
         requestCount++;
         log.info("requests count {}", requestCount);
-        log.info("body {}", body);
         saveNews(newsResponse);
 
 
-        /// from the news response we can extract the page and recall the function
+        /// from the news response we can extract the next page token and recall the function
         nextPage = newsResponse.getNextPage();
         log.info("nextPage ISSSSSSSSS {}", nextPage);
 
@@ -141,8 +146,7 @@ public class NewsApiService {
 
         /// recursively call this function with the next page and rebuild the builder object
         /// we can validate the request count before calling it again
-
-        if(requestCount >3){
+        if(requestCount >=3){
             return;
         }
 
