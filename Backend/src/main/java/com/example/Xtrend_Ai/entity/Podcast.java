@@ -1,10 +1,14 @@
 package com.example.Xtrend_Ai.entity;
 
+import com.example.Xtrend_Ai.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -17,11 +21,14 @@ public class Podcast {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String title;
 
-    @Column(name="audio_file")
-    private String audioFile;
+    private Status status;
 
+
+    private String key;
+
+    @Column(name="created_at")
+    private String date = LocalDateTime.now().toString();
 
 
     @ManyToOne

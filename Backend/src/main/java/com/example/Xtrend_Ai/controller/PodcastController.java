@@ -5,6 +5,7 @@ import com.example.Xtrend_Ai.dto.PodcastResponse;
 import com.example.Xtrend_Ai.service.PodcastService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +25,7 @@ public class PodcastController {
      */
     @PostMapping(path = "/generate")
     public ResponseEntity<PodcastResponse> generatePodcast(@RequestBody PodcastRequest podcastRequest){
-        PodcastResponse podcastResponse = podcastService.getPodcast(podcastRequest);
+        PodcastResponse podcastResponse = podcastService.generatePodcast(podcastRequest);
         return new ResponseEntity<>(podcastResponse, HttpStatus.CREATED);
 
     }

@@ -9,14 +9,5 @@ import lombok.*;
 @Builder
 public class PodcastResponse {
 
-    private Data data;
 
-    @Getter
-    @Setter
-    @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Data {
-        private String audio;
-    }
 }

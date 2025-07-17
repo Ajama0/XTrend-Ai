@@ -74,8 +74,8 @@ public class NewsApiService {
 
 
 
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    @Async
+    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    //@Async
     public void defineBase() throws IOException {
         log.info("running now");
 
