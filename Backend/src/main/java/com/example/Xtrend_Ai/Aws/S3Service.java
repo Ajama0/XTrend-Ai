@@ -65,7 +65,7 @@ public class S3Service {
      * @return presigned URL
      */
 
-    public URL generatePreSignedUrls(String bucket, String key) {
+    public URL getPresignedForObject(String bucket, String key) {
 
         GetObjectRequest objectRequest = getObject(bucket, key);
         // you can change expiration time here

@@ -1,6 +1,7 @@
 package com.example.Xtrend_Ai.service;
 
 
+import com.example.Xtrend_Ai.Aws.S3Service;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
 import com.example.Xtrend_Ai.entity.News;
@@ -8,6 +9,7 @@ import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.enums.Status;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
+import com.example.Xtrend_Ai.exceptions.AudioNotFoundException;
 import com.example.Xtrend_Ai.exceptions.UsernameNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
@@ -34,10 +36,10 @@ public class PodcastService {
     private final PodcastRepository podcastRepository;
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
-    private final ObjectMapper objectMapper;
+    private final S3Service s3Service;
 
 
-    @Value("${bucket-name}")
+    @Value("${bucket.name}")
     private String bucketName;
 
     public PodcastResponse getPodcast(PodcastRequest podcastRequest)  {
@@ -61,23 +63,22 @@ public class PodcastService {
             podcastRepository.save(podcast);
 
             try {
-                String JSON = objectMapper.writeValueAsString(podcastRequest);
                 podcastRequest.setArticleUrl(news.getArticle().getSource_url());
-                RequestBody body = RequestBody.create(MediaType.parse("application/json"), JSON);
 
-                /// Setting up request
-                client.get()
+                client.post()
                         .uri("/generate-podcast")
+                        .bodyValue(podcastRequest)
                         .retrieve()
                         .bodyToMono(byte[].class)
-                        .subscribe(bytes -> uploadPodcast("", podcast.getId(), bytes));
+                        .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), bytes));
 
 
-            }catch(IOException e){
+            }catch(RuntimeException e){
                 throw new RuntimeException("Failed to get podcast from Flask: " + e.getMessage());
 
                 }
 
+            /// returned straight away for client side polling.
         return PodcastResponse.builder()
                 .podcastId(podcast.getId())
                 .status(podcast.getStatus())
@@ -87,7 +88,27 @@ public class PodcastService {
 
 
 
-    public void uploadPodcast(String bucket,Long podcastId, byte[] bytes ) {}
+    public void uploadPodcast(String bucket,Long podcastId, byte[] bytes )  {
+        if(bytes == null || bytes.length == 0) {
+            throw new AudioNotFoundException("audio either null or empty");
+        }
+
+        Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()->
+                new AudioNotFoundException("podcast with id " + podcastId + " not found"));
+
+
+        String key = "podcasts/upload/%s/%s".formatted(podcastId, podcast.getKey());
+        s3Service.putObject(bucket, key, bytes);
+        podcast.setStatus(Status.COMPLETED);
+
+    }
+
+
+
+
+
+
+
 
 
 
