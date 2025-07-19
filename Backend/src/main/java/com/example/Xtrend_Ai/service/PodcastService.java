@@ -15,6 +15,7 @@ import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -36,6 +37,8 @@ public class PodcastService {
     private final ObjectMapper objectMapper;
 
 
+    @Value("${bucket-name}")
+    private String bucketName;
 
     public PodcastResponse getPodcast(PodcastRequest podcastRequest)  {
 
@@ -63,26 +66,17 @@ public class PodcastService {
                 RequestBody body = RequestBody.create(MediaType.parse("application/json"), JSON);
 
                 /// Setting up request
-                Mono<Byte[]> response = client.get()
+                client.get()
                         .uri("/generate-podcast")
                         .retrieve()
-                        .bodyToMono(Byte[].class);
+                        .bodyToMono(byte[].class)
+                        .subscribe(bytes -> uploadPodcast("", podcast.getId(), bytes));
 
-                /// accessing the raw audio
-                Byte[] audio = response.block();
-
-                if (audio != null && audio.length > 0) {
-                    uploadPodcast("", podcast.getId(), audio);
-
-                } else {
-                    throw new RuntimeException("audio is empty or null ");
-                }
 
             }catch(IOException e){
                 throw new RuntimeException("Failed to get podcast from Flask: " + e.getMessage());
 
                 }
-
 
         return PodcastResponse.builder()
                 .podcastId(podcast.getId())
@@ -93,7 +87,7 @@ public class PodcastService {
 
 
 
-    public void uploadPodcast(String bucket,Long podcastId, Byte[] bytes ) {}
+    public void uploadPodcast(String bucket,Long podcastId, byte[] bytes ) {}
 
 
 
