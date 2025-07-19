@@ -16,6 +16,6 @@ public class PodcastRequest {
     /// the user who generated the request
     private String username;
 
-
+    private Boolean LongForm;
     private String articleUrl;
 }

@@ -10,6 +10,7 @@ import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.enums.Status;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.exceptions.AudioNotFoundException;
+import com.example.Xtrend_Ai.exceptions.PodcastNotFoundException;
 import com.example.Xtrend_Ai.exceptions.UsernameNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
@@ -25,8 +26,11 @@ import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,18 +46,23 @@ public class PodcastService {
     @Value("${bucket.name}")
     private String bucketName;
 
-    public PodcastResponse getPodcast(PodcastRequest podcastRequest)  {
+    public PodcastResponse generatePodcast(PodcastRequest podcastRequest)  {
 
             News news  = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new
-                    ArticleNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
+                    PodcastNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
 
             User user  = userRepository.findByUsername(podcastRequest.getUsername()).orElseThrow(()->
                     new UsernameNotFoundException("User not found"));
 
-            String key = UUID.randomUUID().toString();
+
+            if(PodcastLimitReached(podcastRequest)) {
+                return
+            }
+
+            String keyNumber = UUID.randomUUID().toString();
 
             Podcast podcast = Podcast.builder()
-                    .key(key)
+                    .key(keyNumber)
                     .date(LocalDateTime.now().toString())
                     .news(news)
                     .status(Status.PROCESSING)
@@ -70,7 +79,7 @@ public class PodcastService {
                         .bodyValue(podcastRequest)
                         .retrieve()
                         .bodyToMono(byte[].class)
-                        .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), bytes));
+                        .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), keyNumber,bytes));
 
 
             }catch(RuntimeException e){
@@ -81,6 +90,7 @@ public class PodcastService {
             /// returned straight away for client side polling.
         return PodcastResponse.builder()
                 .podcastId(podcast.getId())
+                .key(podcast.getKey())
                 .status(podcast.getStatus())
                 .build();
     }
@@ -88,20 +98,99 @@ public class PodcastService {
 
 
 
-    public void uploadPodcast(String bucket,Long podcastId, byte[] bytes )  {
+    public void uploadPodcast(String bucket,Long podcastId, String keyNumber, byte[] bytes )  {
         if(bytes == null || bytes.length == 0) {
             throw new AudioNotFoundException("audio either null or empty");
         }
+        Podcast podcast = podcastRepository.findById(podcastId)
+                .orElseThrow(() -> new PodcastNotFoundException("Podcast with ID %s not found".formatted(podcastId)));
 
-        Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()->
-                new AudioNotFoundException("podcast with id " + podcastId + " not found"));
 
-
-        String key = "podcasts/upload/%s/%s".formatted(podcastId, podcast.getKey());
+        String key = "podcast/audio/%s/%s".formatted(podcastId, keyNumber);
         s3Service.putObject(bucket, key, bytes);
+
         podcast.setStatus(Status.COMPLETED);
+        podcastRepository.save(podcast);
 
     }
+
+    /**
+     * used for client side polling, as we check the status of the podcast generation
+     * @param podcastId - the podcast that was just created
+     * @param keyNumber - the identifier of the object
+     * @return a presigned url
+     */
+    public PodcastResponse podcastStatus (Long podcastId, String keyNumber )  {
+        Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()-> new PodcastNotFoundException(
+                "podcast with id " + podcastId + " not found"
+        ));
+
+        if(podcast.getStatus() == Status.COMPLETED) {
+            String audioFile = getPodcast(podcastId);
+            return PodcastResponse.builder()
+                    .status(podcast.getStatus())
+                    .url(audioFile)
+                    .build();
+        }
+        else{
+            return PodcastResponse
+                    .builder()
+                    .status(podcast.getStatus())
+                    .build();
+        }
+
+    }
+
+
+    public String getPodcast(Long podcastId) {
+        Podcast findPodcast = podcastRepository.findById(podcastId).orElseThrow(()->
+                new PodcastNotFoundException("Podcast with id " + podcastId + " not found"));
+
+
+        String key = "podcast/audio/%s/%s".formatted(findPodcast.getId(), findPodcast.getKey());
+        /// presigned url that is a temporary accessible link to our bucket object
+        URL audioUrl = s3Service.getPresignedForObject(bucketName,key);
+
+        if(audioUrl != null) {
+            return audioUrl.toString();
+        }
+        else{
+            throw new AudioNotFoundException("audio returned from s3 is not found");
+        }
+
+
+    }
+
+    /**
+     * this is to ensure a user can generate maximum of 2 podcasts from the same article and same form of content
+     * @param podcastRequest - validate if limit has been reached
+     * @return Boolean of True if limit reached
+     */
+    public Boolean PodcastLimitReached(PodcastRequest podcastRequest) {
+
+        User user = userRepository.findByUsername(podcastRequest.getUsername()).
+                orElseThrow(()->new UsernameNotFoundException("User not found"));
+
+        News news = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new ArticleNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
+
+        /// user has maximum of 2 generated podcasts for the same article and same Form of content
+        /// content can be short Form or Long form
+        /// user X can generate long form/short form podcasts from the same article a maximum of twice
+        List<Podcast> podcastsGenerated = podcastRepository.findAll()
+                .stream()
+                .filter(podcast ->podcast.getUser().equals(user) && podcast.getNews().equals(news)
+                        && podcast.getLongForm().equals(podcastRequest.getLongForm()))
+                .toList();
+
+        if (podcastsGenerated.size() >=2) {
+            return true;
+        }else{
+            return false;
+        }
+
+
+    }
+
 
 
 

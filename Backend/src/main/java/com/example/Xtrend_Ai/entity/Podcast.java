@@ -27,6 +27,8 @@ public class Podcast {
 
     private String key;
 
+    private Boolean LongForm;
+
     @Column(name="created_at")
     private String date = LocalDateTime.now().toString();
 
