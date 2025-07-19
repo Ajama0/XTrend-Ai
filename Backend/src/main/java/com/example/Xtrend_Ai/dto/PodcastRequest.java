@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class PodcastRequest {
     private Long newsId;
     /// the user who generated the request
-    private String username;
+    private String email;
 
     private ContentForm contentForm;
     private String articleUrl;

@@ -15,8 +15,8 @@ public class LoginService {
 
 
 
-    public User login(String username){
-        return userRepository.findByUsername(username)
+    public User login(String email){
+        return userRepository.findByEmail(email)
                 .orElseThrow(()-> new UsernameNotFoundException("Username not found"));
     }
 }

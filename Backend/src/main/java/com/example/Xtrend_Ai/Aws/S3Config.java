@@ -12,8 +12,6 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Configuration
 public class S3Config {
 
-    @Value("${aws.region}")
-    private String region;
 
     @Value("{aws.access.key}")
     private String ACCESS_KEY;
@@ -30,7 +28,7 @@ public class S3Config {
         //credentials are required because the user will access the bucket based of our credentials
         AwsBasicCredentials credentials = AwsBasicCredentials.create(ACCESS_KEY, SECRET_KEY);
         software.amazon.awssdk.services.s3.S3Client client = software.amazon.awssdk.services.s3.S3Client.builder()
-                .region(Region.of(region))
+                .region(Region.EU_CENTRAL_1)
                 .credentialsProvider(StaticCredentialsProvider.create(credentials))
                 .build();
 
@@ -42,7 +40,7 @@ public class S3Config {
     public S3Presigner s3Presigner() {
         //essentially it will use this presigner implementation we return to create a presignrequest for our object
 
-        Region awsRegion = Region.of(region);
+        Region awsRegion = Region.EU_CENTRAL_1;
         return S3Presigner.builder()
                 .region(awsRegion)
                 .credentialsProvider(StaticCredentialsProvider.create(

@@ -25,7 +25,7 @@ public class ApiClient {
      * spring now knows which instance of Okhttpclient to inject based on their configs
      * @param Client - the configured http client with timeouts
      */
-    public ApiClient(@Qualifier("NewsApiHttpClient") OkHttpClient Client) {
+    public ApiClient(OkHttpClient Client) {
         this.Client = Client;
 
     }

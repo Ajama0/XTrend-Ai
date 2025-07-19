@@ -20,7 +20,7 @@ public class HeyGenClient {
 
     private OkHttpClient client;
 
-    public HeyGenClient(@Qualifier("HeyGen")OkHttpClient okHttpClient) {
+    public HeyGenClient(OkHttpClient okHttpClient) {
         this.client = okHttpClient;
     }
 

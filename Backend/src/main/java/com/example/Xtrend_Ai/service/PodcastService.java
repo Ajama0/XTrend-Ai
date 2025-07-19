@@ -19,6 +19,7 @@ import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
@@ -36,9 +37,10 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PodcastService {
 
-    private final WebClient client = WebClient.create("http://localhost:5000");
+    private final WebClient client = WebClient.create("http://localhost:8000");
     private final PodcastRepository podcastRepository;
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
@@ -53,7 +55,7 @@ public class PodcastService {
             News news  = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new
                     PodcastNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
 
-            User user  = userRepository.findByUsername(podcastRequest.getUsername()).orElseThrow(()->
+            User user  = userRepository.findByEmail(podcastRequest.getEmail()).orElseThrow(()->
                     new UsernameNotFoundException("User not found"));
 
 
@@ -102,6 +104,7 @@ public class PodcastService {
 
 
     public void uploadPodcast(String bucket,Long podcastId, String keyNumber, byte[] bytes )  {
+        log.info("podcast generated now to be saved in s3");
         if(bytes == null || bytes.length == 0) {
             throw new AudioNotFoundException("audio either null or empty");
         }
@@ -111,6 +114,7 @@ public class PodcastService {
 
         String key = "podcast/audio/%s/%s".formatted(podcastId, keyNumber);
         s3Service.putObject(bucket, key, bytes);
+        log.info("saved in s3!!");
 
         podcast.setStatus(Status.COMPLETED);
         podcastRepository.save(podcast);
@@ -170,7 +174,7 @@ public class PodcastService {
      */
     public PodcastLimitResponse PodcastLimitReached(PodcastRequest podcastRequest) {
 
-        User user = userRepository.findByUsername(podcastRequest.getUsername()).
+        User user = userRepository.findByEmail(podcastRequest.getEmail()).
                 orElseThrow(()->new UsernameNotFoundException("User not found"));
 
         News news = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new ArticleNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));

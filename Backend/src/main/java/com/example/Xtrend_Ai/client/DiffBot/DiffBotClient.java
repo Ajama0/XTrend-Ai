@@ -26,7 +26,7 @@ public class DiffBotClient {
 
 
     private final OkHttpClient client;
-    public DiffBotClient(@Qualifier("DifBotHttpClient")OkHttpClient client) {
+    public DiffBotClient(OkHttpClient client) {
         this.client = client;
     }
 
