@@ -5,6 +5,7 @@ import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask import send_from_directory
+from flask import send_file
 
 
 
@@ -32,7 +33,7 @@ trending_news_config = {
     'roles_person1': 'main summarizer',
     'roles_person2': 'subject matter expert',
     'dialogue_structure': ['Intro', 'Discussion', 'Outro'],
-    'podcast_name': 'XTrends',
+    'podcast_name': 'Rela Ai',
     'podcast_tagline': 'Trendy podcasts on demand',
     'output_language': 'English',
     'user_instructions': 'Make it fun',
@@ -52,35 +53,42 @@ def health_check():
 @app.route('/generate-podcast', methods=['POST'])
 def generate():
     print("in function -----------------")
-    data = request.json.get("data")
-    url = data.get("url")
+    requestObject = request.get_json()
+    if not requestObject:
+        return jsonify({"error": "Invalid request data"}), 400
+    
+    url = requestObject.get("articleUrl")
+    contentFormat = requestObject.get("contentForm")
 
-    print("data recieved", data)
+    print("url", url)
+    print("contentFormat", contentFormat)
+    
+    
+    longform = contentFormat == "LONG"
 
     OPENAI_KEY = os.getenv("OPENAI_API_KEY")
     audio_path = generate_podcast(
         urls=[url],
         tts_model="openai",
-        longform=False,
+        longform=longform,
         conversation_config=trending_news_config,
         api_key_label=OPENAI_KEY
     )
 
 
     print("audio path", audio_path)
-    filename = os.path.basename(audio_path)
-    public_url = f"http://localhost:8000/audio/{filename}"
+    if not audio_path:
+        return jsonify({"error": "Failed to generate podcast"}), 500
     
+    
+     #we can return the audio file directly
+    return send_file(audio_path, mimetype='audio/mpeg')
+
+
+
     
 
-    return jsonify({
-        "data": {
-            "audio": public_url
-        }
-    })
-    
-
-@app.route('/audio/<filename>')
+@app.route('/audio/<filename>', methods=['GET'])
 def serve_audio(filename):
     return send_from_directory("data/audio", filename)
 
