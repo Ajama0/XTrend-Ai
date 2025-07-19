@@ -1,22 +1,26 @@
 package com.example.Xtrend_Ai.config;
 
+import io.netty.channel.ChannelOption;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.handler.timeout.WriteTimeoutHandler;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 @Configuration
 public class HttpClientConfig {
 
 
-    @Bean
-    public OkHttpClient DifBotHttpClient() {
-        return new OkHttpClient();
-    }
+
 
     @Bean
-    public OkHttpClient NewsApiHttpClient() {
+    public OkHttpClient configuredClient() {
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .connectTimeout(30, TimeUnit.SECONDS)
                 .readTimeout(30, TimeUnit.SECONDS)
@@ -27,25 +31,27 @@ public class HttpClientConfig {
 
     }
 
+    /**
+     * configuring timeout for I/O handling
+     * @return configured webclient instance
+     */
+    public WebClient configuredWebClient() {
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
+                .responseTimeout(Duration.ofMillis(5000))
+                .doOnConnected(conn ->
+                        conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
+                                .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)));
 
-    @Bean
-    public OkHttpClient HeyGen() {
-        return new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(45, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
+        WebClient client = WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient))
                 .build();
+
+        return client;
     }
 
 
-    @Bean
-    public OkHttpClient Podcast() {
-        return new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(45, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS)
-                .build();
-    }
+
     }
 
 
