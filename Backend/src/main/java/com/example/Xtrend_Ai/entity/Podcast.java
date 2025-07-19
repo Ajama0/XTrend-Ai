@@ -1,5 +1,6 @@
 package com.example.Xtrend_Ai.entity;
 
+import com.example.Xtrend_Ai.enums.ContentForm;
 import com.example.Xtrend_Ai.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,7 @@ public class Podcast {
 
     private String key;
 
-    private Boolean LongForm;
+    private ContentForm contentForm;
 
     @Column(name="created_at")
     private String date = LocalDateTime.now().toString();

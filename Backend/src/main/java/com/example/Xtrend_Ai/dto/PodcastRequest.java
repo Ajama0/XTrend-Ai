@@ -1,5 +1,6 @@
 package com.example.Xtrend_Ai.dto;
 
+import com.example.Xtrend_Ai.enums.ContentForm;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,6 @@ public class PodcastRequest {
     /// the user who generated the request
     private String username;
 
-    private Boolean LongForm;
+    private ContentForm contentForm;
     private String articleUrl;
 }

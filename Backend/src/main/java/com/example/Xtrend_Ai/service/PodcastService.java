@@ -2,11 +2,13 @@ package com.example.Xtrend_Ai.service;
 
 
 import com.example.Xtrend_Ai.Aws.S3Service;
+import com.example.Xtrend_Ai.dto.PodcastLimitResponse;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
 import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.entity.User;
+import com.example.Xtrend_Ai.enums.ContentForm;
 import com.example.Xtrend_Ai.enums.Status;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.exceptions.AudioNotFoundException;
@@ -55,10 +57,11 @@ public class PodcastService {
                     new UsernameNotFoundException("User not found"));
 
 
-            if(PodcastLimitReached(podcastRequest)) {
-                return
+            /// check for limit reached before generating
+            PodcastLimitResponse limit= PodcastLimitReached(podcastRequest);
+            if(limit.getLimitReached().equals(Boolean.TRUE)) {
+                return PodcastResponse.builder().build();
             }
-
             String keyNumber = UUID.randomUUID().toString();
 
             Podcast podcast = Podcast.builder()
@@ -117,10 +120,9 @@ public class PodcastService {
     /**
      * used for client side polling, as we check the status of the podcast generation
      * @param podcastId - the podcast that was just created
-     * @param keyNumber - the identifier of the object
      * @return a presigned url
      */
-    public PodcastResponse podcastStatus (Long podcastId, String keyNumber )  {
+    public PodcastResponse podcastStatus (Long podcastId)  {
         Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()-> new PodcastNotFoundException(
                 "podcast with id " + podcastId + " not found"
         ));
@@ -166,7 +168,7 @@ public class PodcastService {
      * @param podcastRequest - validate if limit has been reached
      * @return Boolean of True if limit reached
      */
-    public Boolean PodcastLimitReached(PodcastRequest podcastRequest) {
+    public PodcastLimitResponse PodcastLimitReached(PodcastRequest podcastRequest) {
 
         User user = userRepository.findByUsername(podcastRequest.getUsername()).
                 orElseThrow(()->new UsernameNotFoundException("User not found"));
@@ -179,13 +181,27 @@ public class PodcastService {
         List<Podcast> podcastsGenerated = podcastRepository.findAll()
                 .stream()
                 .filter(podcast ->podcast.getUser().equals(user) && podcast.getNews().equals(news)
-                        && podcast.getLongForm().equals(podcastRequest.getLongForm()))
+                        && podcast.getContentForm().equals(podcastRequest.getContentForm()))
                 .toList();
 
         if (podcastsGenerated.size() >=2) {
-            return true;
+            String alternative;
+            if(podcastRequest.getContentForm() == ContentForm.LONG){
+                alternative = ContentForm.SHORT.toString();
+            }else{
+                alternative = ContentForm.LONG.toString();
+            }
+            return PodcastLimitResponse.builder()
+                    .limitReached(true)
+                    .message("you have reached the maximum limit for generating podcasts with %s form content However you can still generate podcasts with %s form content"
+                            .formatted(podcastRequest.getContentForm(), alternative))
+                    .build();
+
         }else{
-            return false;
+            return PodcastLimitResponse.builder()
+                    .limitReached(false)
+                    .message("you can proceed with podcast generation")
+                    .build();
         }
 
 
