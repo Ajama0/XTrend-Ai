@@ -9,20 +9,6 @@ from flask import send_file
 
 
 
-trending_news_config= {
-    'conversation_style': ['Engaging', 'informative', 'Enthusiastic', 'Educational'], 
-    'roles_person1': 'main summarizer', 
-    'roles_person2': 'Subject matter expert', 
-    'dialogue_structure': ['Topic Introduction', 'Summary of Key Points', 'Discussions', 'Q&A Session', 'Farewell Messages'], 
-    'podcast_name': 'XTrends', 
-    'podcast_tagline': 'Your very own podcast catered to the current trending topics ', 
-    'output_language': 'English', 
-    'user_instructions': 'Make if fun and engaging', 
-    'engagement_techniques': ['Rhetorical Questions', 'Personal Testimonials', 'Quotes', 'Anecdotes', 'Analogies', 'Humor'], 
-    'creativity': 0.75
-}
-
-
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
@@ -53,7 +39,9 @@ def health_check():
 @app.route('/generate-podcast', methods=['POST'])
 def generate():
     print("in function -----------------")
-    requestObject = request.get_json()
+    requestObject = request.get_json(force=True)
+
+    print("requestObject", requestObject)
     if not requestObject:
         return jsonify({"error": "Invalid request data"}), 400
     
