@@ -18,11 +18,13 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
@@ -79,10 +81,14 @@ public class PodcastService {
             podcastRepository.save(podcast);
 
             try {
-                podcastRequest.setArticleUrl(news.getArticle().getSource_url());
+                podcastRequest.setArticleUrl(news.getArticle().getLink());
+
+                log.info(" podcast request {}", podcastRequest);
+
 
                 client.post()
                         .uri("/generate-podcast")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(podcastRequest)
                         .retrieve()
                         .bodyToMono(byte[].class)
