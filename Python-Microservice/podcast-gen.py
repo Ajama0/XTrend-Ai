@@ -16,22 +16,28 @@ load_dotenv()
 
 trending_news_config = {
     'conversation_style': ['Engaging', 'Fast-paced'],
-    'roles_person1': 'main summarizer',
-    'roles_person2': 'subject matter expert',
-    'dialogue_structure': ['Intro', 'Discussion', 'Outro'],
-    'podcast_name': 'Rela Ai',
-    'podcast_tagline': 'Trendy podcasts on demand',
+    'roles_person1': 'enthusiastic host who makes the news fun and interesting',
+    'roles_person2': 'fun, sarcastic co-host who reacts with jokes and surprise',
+    'podcast_name': 'Rela A-I',
+    'podcast_tagline': 'Your daily dose of trending news',
     'output_language': 'English',
-    'user_instructions': 'Make it fun',
-    'engagement_techniques': ['Quotes', 'Humor'],
-    'creativity': 0.75
+    'user_instructions': 'Always start with the podcast name only, do not spell it out. Speakers should often overlap in their sentences. Make sure to include a lot of humour and quotes from the articles. Also Introduce the podcast as Rela A I, pronouncing each letter in A-I clearly.',
+    'engagement_techniques': ['Quotes', 'Humour'],
+    'creativity': 1,
 }
-
-
 @app.route('/', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    return jsonify({"status": "Flask app is runningggg!"})
+def temp_audio():
+
+    OPENAI_KEY = os.getenv("OPENAI_API_KEY")
+    audio_path = generate_podcast(
+        urls=["https://www.slashgear.com/1911599/can-americans-drive-in-england-with-us-driver-license-what-need-know/"],
+        tts_model="openai",
+        longform=True,
+        conversation_config=trending_news_config,
+        api_key_label=OPENAI_KEY
+    )
+    return send_file(audio_path, mimetype='audio/mpeg')
+
 
 
 
@@ -39,7 +45,13 @@ def health_check():
 @app.route('/generate-podcast', methods=['POST'])
 def generate():
     print("in function -----------------")
-    requestObject = request.get_json(force=True)
+    print("Content-Type:", request.content_type)
+    print("Raw data:", request.data)
+
+
+
+
+    requestObject = request.get_json()
 
     print("requestObject", requestObject)
     if not requestObject:
@@ -73,6 +85,14 @@ def generate():
     return send_file(audio_path, mimetype='audio/mpeg')
 
 
+
+    
+
+@app.route('/test', methods=['POST'])
+def testing():
+    print("in testing function")
+    print("data",request.data)
+    print ("content_type" ,request.content_type)
 
     
 

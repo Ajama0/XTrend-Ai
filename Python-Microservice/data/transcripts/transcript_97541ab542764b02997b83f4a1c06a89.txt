@@ -1,0 +1,13 @@
+<Person1> "Welcome to Rela Ai - Trendy podcasts on demand!  Today, we're diving headfirst into a whirlwind of headlines ripped straight from Yahoo News!"
+</Person1><Person2> "Buckle up, listeners!  From Trump and Epstein to zero-mileage used cars in China, we've got a packed show." 
+</Person2><Person1> "First up, this alleged Trump letter to Epstein… wild stuff.  The Wall Street Journal reporting on a lewd letter?  Over 20 years ago, mind you.  Trump, of course, denies it." 
+</Person1><Person2> "Definitely a headline grabber.  And then there's the ICE head saying they'll arrest anyone in the U.S. illegally, even without a criminal record.  Big implications there."
+</Person2><Person1> "Huge.  Switching gears, Coke might ditch corn syrup!  Farmers and bottlers are, understandably, freaking out." 
+</Person1><Person2> "Yeah, talk about market disruption!  And speaking of leaving, In-N-Out billionaire Lynsi Snyder is reportedly leaving California. Says it's 'not easy here'."
+</Person2><Person1> "Interesting.  Cities and states are throwing cash at remote workers, trying to lure them in.  Meanwhile, tariffs are messing with holiday shopping—fewer toys, higher prices. Ouch." 
+</Person1><Person2> "Double ouch.  On the international front, China's cracking down on those zero-mileage used cars.  Apparently, it's a whole thing over there." 
+</Person2><Person1> "Who knew? Uh, then there's this FDA recall on a popular deodorant. Always good to stay on top of those." 
+</Person1><Person2> "Safety first!  Oh, and we've got some corporate drama – an Astronomer CEO caught on a Coldplay 'kiss cam'."
+</Person2><Person1> "A scandal?  Gotta love it!  Also, a quick dive into the Druze religious sect—their beliefs and history.  Always fascinating to learn about different cultures." 
+</Person1><Person2> "Absolutely.  And finally, the CEO of Cardinal Health got 'ruthless' to turn the company around after a $300 million earnings drop." 
+</Person2><Person1> "Wow, what a rollercoaster of news!  Thanks for tuning in to Rela Ai! We'll catch you next time with more trendy podcasts on demand.  Goodbye!" </Person1>
