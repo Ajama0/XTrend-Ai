@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.dto;
 
 import com.example.Xtrend_Ai.enums.ContentForm;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PodcastRequest {
     private Long newsId;
     /// the user who generated the request

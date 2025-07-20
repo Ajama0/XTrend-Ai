@@ -52,6 +52,7 @@ public class PodcastService {
 
     public PodcastResponse generatePodcast(PodcastRequest podcastRequest)  {
 
+
             News news  = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new
                     PodcastNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
 
@@ -70,6 +71,7 @@ public class PodcastService {
                     .key(keyNumber)
                     .date(LocalDateTime.now().toString())
                     .news(news)
+                    .contentForm(podcastRequest.getContentForm())
                     .status(Status.PROCESSING)
                     .user(user)
                     .build();
@@ -188,7 +190,7 @@ public class PodcastService {
                         && podcast.getContentForm().equals(podcastRequest.getContentForm()))
                 .toList();
 
-        if (podcastsGenerated.size() >=2) {
+        if (podcastsGenerated.size() >=10) {
             String alternative;
             if(podcastRequest.getContentForm() == ContentForm.LONG){
                 alternative = ContentForm.SHORT.toString();
