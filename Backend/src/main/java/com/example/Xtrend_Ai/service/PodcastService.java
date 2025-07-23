@@ -140,10 +140,10 @@ public class PodcastService {
         ));
 
         if(podcast.getStatus() == Status.COMPLETED) {
-            String audioFile = getPodcast(podcastId);
+            PodcastResponse podcastResponse = getPodcast(podcastId);
             return PodcastResponse.builder()
                     .status(podcast.getStatus())
-                    .url(audioFile)
+                    .url(podcastResponse.getUrl())
                     .build();
         }
         else{

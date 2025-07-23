@@ -28,6 +28,7 @@ public class Podcast {
 
     private String key;
 
+
     private ContentForm contentForm;
 
     @Column(name="created_at")

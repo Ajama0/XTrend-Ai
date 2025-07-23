@@ -33,4 +33,11 @@ public class PodcastController {
         PodcastResponse podcastResponse = podcastService.getPodcast(PodcastId);
         return new ResponseEntity<>(podcastResponse, HttpStatus.OK);
     }
+
+
+    @GetMapping(path = "/status/{id}")
+    public ResponseEntity<PodcastResponse>PollingStatus(@PathVariable("id")Long PodcastId){
+        PodcastResponse podcastResponse = podcastService.podcastStatus(PodcastId);
+        return new ResponseEntity<>(podcastResponse, HttpStatus.OK);
+    }
 }

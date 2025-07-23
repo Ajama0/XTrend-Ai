@@ -70,7 +70,7 @@ public class S3Service {
         GetObjectRequest objectRequest = getObject(bucket, key);
         // you can change expiration time here
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(Duration.ofMinutes(3600 * 7)) //24 hours
+                .signatureDuration(Duration.ofMinutes(60 * 24 * 7))
                 .getObjectRequest(objectRequest)
                 .build();
 
