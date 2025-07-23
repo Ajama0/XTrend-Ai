@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PodcastService {
 
-    private final WebClient client = WebClient.create("http://localhost:8000");
+    private final WebClient client;
     private final PodcastRepository podcastRepository;
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
