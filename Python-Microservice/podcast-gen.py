@@ -12,7 +12,7 @@ from flask import send_file
 app = Flask(__name__)
 CORS(app)
 load_dotenv()
-
+#Also Introduce the podcast as Rela A I, pronouncing each letter in A-I clearly
 
 trending_news_config = {
     'conversation_style': ['Engaging', 'Fast-paced'],
@@ -21,24 +21,10 @@ trending_news_config = {
     'podcast_name': 'Rela A-I',
     'podcast_tagline': 'Your daily dose of trending news',
     'output_language': 'English',
-    'user_instructions': 'Always start with the podcast name only, do not spell it out. Speakers should often overlap in their sentences. Make sure to include a lot of humour and quotes from the articles. Also Introduce the podcast as Rela A I, pronouncing each letter in A-I clearly.',
+    'user_instructions': 'do not spell out podcast name, read it normally. Speakers should often overlap in their sentences. Make sure to include a lot of humour and quotes from the articles.',
     'engagement_techniques': ['Quotes', 'Humour'],
     'creativity': 1,
 }
-@app.route('/', methods=['GET'])
-def temp_audio():
-
-    OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-    audio_path = generate_podcast(
-        urls=["https://www.slashgear.com/1911599/can-americans-drive-in-england-with-us-driver-license-what-need-know/"],
-        tts_model="openai",
-        longform=True,
-        conversation_config=trending_news_config,
-        api_key_label=OPENAI_KEY
-    )
-    return send_file(audio_path, mimetype='audio/mpeg')
-
-
 
 
 

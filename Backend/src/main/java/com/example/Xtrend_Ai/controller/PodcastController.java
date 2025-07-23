@@ -40,4 +40,10 @@ public class PodcastController {
         PodcastResponse podcastResponse = podcastService.podcastStatus(PodcastId);
         return new ResponseEntity<>(podcastResponse, HttpStatus.OK);
     }
+
+    @DeleteMapping(path="delete/{id}")
+    public ResponseEntity<Void> deletePodcast(@PathVariable("id")Long PodcastId){
+        podcastService.deletePodcast();
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
 }

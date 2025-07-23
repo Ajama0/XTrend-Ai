@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.service;
 
 
 import com.example.Xtrend_Ai.Aws.S3Service;
+import com.example.Xtrend_Ai.Mail.MailService;
 import com.example.Xtrend_Ai.dto.PodcastLimitResponse;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
@@ -47,6 +48,7 @@ public class PodcastService {
     private final NewsRepository newsRepository;
     private final UserRepository userRepository;
     private final S3Service s3Service;
+    private final MailService mailService;
 
 
     @Value("${bucket.name}")
@@ -141,6 +143,18 @@ public class PodcastService {
 
         if(podcast.getStatus() == Status.COMPLETED) {
             PodcastResponse podcastResponse = getPodcast(podcastId);
+            /// as soon as we fetch the podcast we want to notify the user via mail
+
+            String bodyFormat = String.format(
+                    "Hi %s,\n\n" +
+                            "Great news! Your latest AI-generated podcast, is now ready.\n\n" +
+                            "Head over to the Rela AI app and check it out under \"My Podcasts\".\n\n" +
+                            "Thank you for using Rela AI!\n\n" +
+                            "– The Rela AI Team",
+                    podcast.getUser().getFirstname()
+            );
+            mailService.sendMail(podcast.getUser().getEmail(), bodyFormat, "Your podcast is finally ready!");
+
             return PodcastResponse.builder()
                     .status(podcast.getStatus())
                     .url(podcastResponse.getUrl())
@@ -223,17 +237,8 @@ public class PodcastService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
+    public void deletePodcast() {
     }
+}
 
 
