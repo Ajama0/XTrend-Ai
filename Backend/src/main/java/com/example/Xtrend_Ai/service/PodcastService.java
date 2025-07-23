@@ -156,7 +156,7 @@ public class PodcastService {
     }
 
 
-    public String getPodcast(Long podcastId) {
+    public PodcastResponse getPodcast(Long podcastId) {
         Podcast findPodcast = podcastRepository.findById(podcastId).orElseThrow(()->
                 new PodcastNotFoundException("Podcast with id " + podcastId + " not found"));
 
@@ -166,7 +166,10 @@ public class PodcastService {
         URL audioUrl = s3Service.getPresignedForObject(bucketName,key);
 
         if(audioUrl != null) {
-            return audioUrl.toString();
+            return PodcastResponse.builder()
+                    .podcastId(findPodcast.getId())
+                    .url(audioUrl.toString())
+                    .build();
         }
         else{
             throw new AudioNotFoundException("audio returned from s3 is not found");

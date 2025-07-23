@@ -7,10 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/podcast")
@@ -28,5 +25,12 @@ public class PodcastController {
         PodcastResponse podcastResponse = podcastService.generatePodcast(podcastRequest);
         return new ResponseEntity<>(podcastResponse, HttpStatus.CREATED);
 
+    }
+
+
+    @GetMapping(path="/download/{id}")
+    public ResponseEntity<PodcastResponse>downloadPodcastUrl(@PathVariable("id")Long PodcastId){
+        PodcastResponse podcastResponse = podcastService.getPodcast(PodcastId);
+        return new ResponseEntity<>(podcastResponse, HttpStatus.OK);
     }
 }
