@@ -43,7 +43,7 @@ public class PodcastController {
 
     @DeleteMapping(path="delete/{id}")
     public ResponseEntity<Void> deletePodcast(@PathVariable("id")Long PodcastId){
-        podcastService.deletePodcast();
+        podcastService.deletePodcast(PodcastId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

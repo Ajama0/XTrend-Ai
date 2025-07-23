@@ -153,7 +153,8 @@ public class PodcastService {
                             "– The Rela AI Team",
                     podcast.getUser().getFirstname()
             );
-            mailService.sendMail(podcast.getUser().getEmail(), bodyFormat, "Your podcast is finally ready!");
+            mailService.sendMail("abasjama06@gmail.com", bodyFormat, "Your podcast is finally ready!");
+            log.info("email sent");
 
             return PodcastResponse.builder()
                     .status(podcast.getStatus())
@@ -163,6 +164,7 @@ public class PodcastService {
         else{
             return PodcastResponse
                     .builder()
+                    .podcastId(podcastId)
                     .status(podcast.getStatus())
                     .build();
         }
@@ -237,7 +239,18 @@ public class PodcastService {
     }
 
 
-    public void deletePodcast() {
+    public void deletePodcast(Long podcastId) {
+        Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()->new PodcastNotFoundException("Podcast with id " + podcastId + " not found"));
+
+        if (podcast.getStatus().equals(Status.PROCESSING)){
+            throw new IllegalArgumentException("Podcast status is PROCESSING therefore cannot be deleted");
+        }
+        else{
+            String key = "podcast/audio/%s/%s".formatted(podcastId, podcast.getKey());
+            s3Service.DeleteObject(bucketName, key);
+            podcastRepository.deleteById(podcastId);
+        }
+
     }
 }
 
