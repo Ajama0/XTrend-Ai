@@ -27,7 +27,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NewsApiServiceTest {
 
-    @Autowired
+
     private NewsApiService underTest;
 
     @Mock
