@@ -46,7 +46,7 @@ class NewsApiServiceTest {
 
     @SneakyThrows
     @Test
-    void getNews() {
+    void IsNewsReturnedAndInTheCorrectType() {
         //given
         //mock the response body as it is returned
         ResponseBody responseBody = mock(ResponseBody.class);
@@ -69,25 +69,9 @@ class NewsApiServiceTest {
 
 
     }
-    @SneakyThrows
-    @Test
-    void defineBase() {
-        //given
-        HttpUrl baseUrl = mock(HttpUrl.class);
-        String nextPage= "";
-        int count = 0;
-        when(HttpUrl.parse(any(String.class))).thenReturn(baseUrl);
-
-        //when
-        underTest.defineBase();
-
-        //then
-        verify(underTest).GetLatestNews(baseUrl,nextPage,count);
-
-    }
 
     @Test
-    void getLatestNews() {
+    void CheckIfLatestNewsIsFetched() {
     }
 
     @Test

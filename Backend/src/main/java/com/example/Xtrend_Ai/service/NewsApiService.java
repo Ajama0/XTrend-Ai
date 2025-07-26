@@ -79,7 +79,10 @@ public class NewsApiService {
         log.info("running now");
 
         HttpUrl BaseUrl = HttpUrl.parse("https://newsdata.io/api/1/latest");
-        GetLatestNews(BaseUrl, null, 1);
+
+        if(BaseUrl !=null) {
+            GetLatestNews(BaseUrl, null, 1);
+        }
 
     }
 
