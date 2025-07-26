@@ -18,11 +18,6 @@ import java.util.List;
 @Slf4j
 public class XtrendAiApplication {
 
-	private final S3Client s3Client;
-
-	@Value("${aws.access.key}")
-	private String accessKey;
-
 	public static void main(String[] args) {
 
 		SpringApplication.run(XtrendAiApplication.class, args);
@@ -30,11 +25,5 @@ public class XtrendAiApplication {
 
 	}
 
-	@PostConstruct
-	public void listBuckets() {
-		log.info("access key is {}",accessKey);
-		List<Bucket> buckets = s3Client.listBuckets().buckets();
 
-		buckets.forEach(bucket -> log.info(bucket.name()));
-	}
 }

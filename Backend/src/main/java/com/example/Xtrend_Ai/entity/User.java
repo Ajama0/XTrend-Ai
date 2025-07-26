@@ -49,7 +49,6 @@ public class User {
     private String password;
 
     @ElementCollection
-    @Column(nullable = true)
     @Enumerated(EnumType.STRING)
     private List<Topics> interests = new ArrayList<>();
 
@@ -58,7 +57,7 @@ public class User {
 
 
     @Column(name = "Updated_At")
-    private LocalDateTime updatedAt;
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
 
 }
