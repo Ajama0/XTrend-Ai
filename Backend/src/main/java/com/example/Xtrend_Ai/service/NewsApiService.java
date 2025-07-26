@@ -6,7 +6,6 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.Article;
-import com.example.Xtrend_Ai.utils.NewsUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
