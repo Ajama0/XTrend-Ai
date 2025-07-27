@@ -76,7 +76,7 @@ class NewsApiServiceTest {
     @Test
     void CheckIfLatestNewsIsFetchedFirstWhenNoPaginationValueIsGiven() {
         //given
-        NewsResponse actual = mock(NewsResponse.class);
+        NewsResponse expectedNewsResponse = mock(NewsResponse.class);
         ResponseBody responseBody = mock(ResponseBody.class);
         String fakeBody = "{\"id\":1,\"title\":\"test\",\"content\":\"test\"}";
         int RequestCount = 1;
@@ -84,8 +84,8 @@ class NewsApiServiceTest {
 
         when(apiClient.fetchTopStories(any(HttpUrl.class))).thenReturn(responseBody);
         when(responseBody.string()).thenReturn(fakeBody);
-        when(objectMapper.readValue(fakeBody, NewsResponse.class)).thenReturn(actual);
-        when(actual.getNextPage()).thenReturn(null);
+        when(objectMapper.readValue(fakeBody, NewsResponse.class)).thenReturn(expectedNewsResponse);
+        when(expectedNewsResponse.getNextPage()).thenReturn(null);
 
         //when
         underTest.GetLatestNews(any(HttpUrl.class), null, RequestCount);
@@ -93,9 +93,10 @@ class NewsApiServiceTest {
         //Capture what is being saved, and make sure it is equal to what we expected
         ArgumentCaptor<NewsResponse> newsResponseCaptor = ArgumentCaptor.forClass(NewsResponse.class);
 
+        //then
         verify(underTest).saveNews(newsResponseCaptor.capture());
         verify(apiClient).fetchTopStories(any(HttpUrl.class));
-        assertEquals(actual, newsResponseCaptor.getValue());
+        assertEquals(expectedNewsResponse, newsResponseCaptor.getValue());
 
     }
 
