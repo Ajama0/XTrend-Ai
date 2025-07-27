@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import okhttp3.HttpUrl;
 import okhttp3.ResponseBody;
+import org.apache.coyote.BadRequestException;
 import org.apache.tomcat.util.http.parser.HttpParser;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +26,7 @@ import retrofit2.http.HTTP;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -113,7 +115,29 @@ class NewsApiServiceTest {
 
 
     @Test
-    void saveNews() {
+    void CanNotSaveNewsWithEmptyBody() {
+        NewsResponse newsResponse = mock(NewsResponse.class);
+
+        //when
+        when(newsResponse.getResults()).thenReturn(Collections.emptyList());
+        assertThrows(IllegalArgumentException.class, ()->{
+            underTest.saveNews(newsResponse);
+
+        });
+    }
+
+    @Test
+    void aveNewsWithBody() {
+
+        //given
+
+
+        //when
+        underTest.saveNews(any(NewsResponse.class));
+
+        ArgumentCaptor<News> captor = ArgumentCaptor.forClass(News.class);
+        verify(newsRepository).save(captor.capture());
+        assertSame(any(News.class), captor.getValue());
     }
 
     @Test

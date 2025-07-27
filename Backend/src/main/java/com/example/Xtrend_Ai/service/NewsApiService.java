@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
 import okhttp3.ResponseBody;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -162,7 +163,7 @@ public class NewsApiService {
 
     public void saveNews(NewsResponse newsResponse) {
     if (newsResponse == null || newsResponse.getResults().isEmpty()) {
-        throw new ArticleNotFoundException("no Articles were  found");
+        throw new IllegalArgumentException("no Articles were  found");
     }
 
     for (Article article : newsResponse.getResults()) {
