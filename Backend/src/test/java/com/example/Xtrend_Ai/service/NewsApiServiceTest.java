@@ -8,10 +8,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import okhttp3.HttpUrl;
 import okhttp3.ResponseBody;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,8 +72,31 @@ class NewsApiServiceTest {
 
     }
 
+    @SneakyThrows
     @Test
-    void CheckIfLatestNewsIsFetched() {
+    void CheckIfLatestNewsIsFetchedFirstWhenNoPaginationValueIsGiven() {
+        //given
+        NewsResponse actual = mock(NewsResponse.class);
+        ResponseBody responseBody = mock(ResponseBody.class);
+        String fakeBody = "{\"id\":1,\"title\":\"test\",\"content\":\"test\"}";
+        int RequestCount = 1;
+
+
+        when(apiClient.fetchTopStories(any(HttpUrl.class))).thenReturn(responseBody);
+        when(responseBody.string()).thenReturn(fakeBody);
+        when(objectMapper.readValue(fakeBody, NewsResponse.class)).thenReturn(actual);
+        when(actual.getNextPage()).thenReturn(null);
+
+        //when
+        underTest.GetLatestNews(any(HttpUrl.class), null, RequestCount);
+
+        //Capture what is being saved, and make sure it is equal to what we expected
+        ArgumentCaptor<NewsResponse> newsResponseCaptor = ArgumentCaptor.forClass(NewsResponse.class);
+
+        verify(underTest).saveNews(newsResponseCaptor.capture());
+        verify(apiClient).fetchTopStories(any(HttpUrl.class));
+        assertEquals(actual, newsResponseCaptor.getValue());
+
     }
 
     @Test

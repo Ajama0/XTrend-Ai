@@ -131,12 +131,11 @@ public class NewsApiService {
         HttpUrl url = builder.build();
         /// we can make the request, handle the processing of response and also fetch the next page string
         ResponseBody responseBody = apiClient.fetchTopStories(url);
-        String body = responseBody.string();
-        log.error("body {}", body);
-        NewsResponse newsResponse = objectMapper.readValue(body, NewsResponse.class);
-        log.info("newsResponse after deserializing{}", newsResponse.toString());
         requestCount++;
-        log.info("requests count {}", requestCount);
+
+        String body = responseBody.string();
+        NewsResponse newsResponse = objectMapper.readValue(body, NewsResponse.class);
+
         saveNews(newsResponse);
 
 
