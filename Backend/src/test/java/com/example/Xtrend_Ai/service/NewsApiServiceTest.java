@@ -4,6 +4,7 @@ import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.repository.NewsRepository;
+import com.example.Xtrend_Ai.utils.Article;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import okhttp3.HttpUrl;
@@ -127,17 +128,22 @@ class NewsApiServiceTest {
     }
 
     @Test
-    void aveNewsWithBody() {
+    void saveNewsWithBody() {
 
         //given
+        Article article = mock(Article.class);
 
+        when(article.getTitle()).thenReturn("test");
+        NewsResponse newsResponse = mock(NewsResponse.class);
+        when(newsResponse.getResults()).thenReturn(List.of(article));
 
         //when
-        underTest.saveNews(any(NewsResponse.class));
+        underTest.saveNews(newsResponse);
 
         ArgumentCaptor<News> captor = ArgumentCaptor.forClass(News.class);
         verify(newsRepository).save(captor.capture());
-        assertSame(any(News.class), captor.getValue());
+        News news = captor.getValue();
+        assertEquals("test", news.getArticle().getTitle());
     }
 
     @Test
