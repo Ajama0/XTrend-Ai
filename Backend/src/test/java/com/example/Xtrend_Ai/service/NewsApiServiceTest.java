@@ -15,13 +15,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import retrofit2.http.HTTP;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,7 +32,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NewsApiServiceTest {
 
-
+    @Spy
     private NewsApiService underTest;
 
     @Mock
@@ -74,7 +77,7 @@ class NewsApiServiceTest {
 
     @SneakyThrows
     @Test
-    void CheckIfLatestNewsIsFetchedFirstWhenNoPaginationValueIsGiven() {
+    void CheckIfLatestNewsIsFetchedAndSavedSuccessfully() {
         //given
         NewsResponse expectedNewsResponse = mock(NewsResponse.class);
         ResponseBody responseBody = mock(ResponseBody.class);
@@ -86,6 +89,7 @@ class NewsApiServiceTest {
         when(responseBody.string()).thenReturn(fakeBody);
         when(objectMapper.readValue(fakeBody, NewsResponse.class)).thenReturn(expectedNewsResponse);
         when(expectedNewsResponse.getNextPage()).thenReturn(null);
+        when(expectedNewsResponse.getNextPage()).thenReturn("p1","p2", "p3"); //stop recursion after 3 iterations
 
         //when
         underTest.GetLatestNews(any(HttpUrl.class), null, RequestCount);
@@ -94,9 +98,19 @@ class NewsApiServiceTest {
         ArgumentCaptor<NewsResponse> newsResponseCaptor = ArgumentCaptor.forClass(NewsResponse.class);
 
         //then
-        verify(underTest).saveNews(newsResponseCaptor.capture());
-        verify(apiClient).fetchTopStories(any(HttpUrl.class));
-        assertEquals(expectedNewsResponse, newsResponseCaptor.getValue());
+        verify(underTest, times(3)).saveNews(newsResponseCaptor.capture());
+        verify(apiClient,times(3)).fetchTopStories(any(HttpUrl.class));
+
+        List<NewsResponse> allSaved = newsResponseCaptor.getAllValues();
+        //we make sure it was saved correctly as we compare.
+        assertEquals(3, allSaved.size());
+        assertTrue(allSaved.stream().allMatch(r -> r == expectedNewsResponse));
+
+    }
+
+    @Test
+    @SneakyThrows
+    void CheckRecursionFinishedWhenRequestCountIsThree() {
 
     }
 
