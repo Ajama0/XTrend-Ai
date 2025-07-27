@@ -8,6 +8,7 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.Article;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.HttpUrl;
@@ -147,7 +148,7 @@ public class NewsApiService {
 
         /// recursively call this function with the next page and rebuild the builder object
         /// we can validate the request count before calling it again
-        if(requestCount >=3){
+        if(requestCount >3){
             return;
         }
 

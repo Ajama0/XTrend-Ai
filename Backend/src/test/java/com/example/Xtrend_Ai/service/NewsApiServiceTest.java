@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class NewsApiServiceTest {
 
-    @Spy
+
     private NewsApiService underTest;
 
     @Mock
@@ -46,7 +47,7 @@ class NewsApiServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new NewsApiService(newsRepository, apiClient, objectMapper);
+        underTest = Mockito.spy(new NewsApiService(newsRepository, apiClient, objectMapper));
     }
 
     @SneakyThrows
@@ -82,17 +83,18 @@ class NewsApiServiceTest {
         NewsResponse expectedNewsResponse = mock(NewsResponse.class);
         ResponseBody responseBody = mock(ResponseBody.class);
         String fakeBody = "{\"id\":1,\"title\":\"test\",\"content\":\"test\"}";
-        int RequestCount = 1;
+        HttpUrl url = HttpUrl.parse("https://example.com");
+
 
 
         when(apiClient.fetchTopStories(any(HttpUrl.class))).thenReturn(responseBody);
         when(responseBody.string()).thenReturn(fakeBody);
         when(objectMapper.readValue(fakeBody, NewsResponse.class)).thenReturn(expectedNewsResponse);
         when(expectedNewsResponse.getNextPage()).thenReturn(null);
-        when(expectedNewsResponse.getNextPage()).thenReturn("p1","p2", "p3"); //stop recursion after 3 iterations
-
+        when(expectedNewsResponse.getNextPage()).thenReturn("p1","p2", "null"); //stop recursion after 3 iterations
+        doNothing().when(underTest).saveNews(any(NewsResponse.class));
         //when
-        underTest.GetLatestNews(any(HttpUrl.class), null, RequestCount);
+        underTest.GetLatestNews(url , null, 1);
 
         //Capture what is being saved, and make sure it is equal to what we expected
         ArgumentCaptor<NewsResponse> newsResponseCaptor = ArgumentCaptor.forClass(NewsResponse.class);
@@ -108,11 +110,7 @@ class NewsApiServiceTest {
 
     }
 
-    @Test
-    @SneakyThrows
-    void CheckRecursionFinishedWhenRequestCountIsThree() {
 
-    }
 
     @Test
     void saveNews() {
