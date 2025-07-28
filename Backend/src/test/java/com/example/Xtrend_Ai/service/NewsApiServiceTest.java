@@ -146,7 +146,5 @@ class NewsApiServiceTest {
         assertEquals("test", news.getArticle().getTitle());
     }
 
-    @Test
-    void findAllNews() {
-    }
+
 }

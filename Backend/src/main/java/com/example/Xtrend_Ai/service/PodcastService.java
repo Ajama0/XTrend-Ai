@@ -211,7 +211,7 @@ public class PodcastService {
         /// user X can generate long form/short form podcasts from the same article a maximum of twice
         List<Podcast> podcastsGenerated = podcastRepository.findAll()
                 .stream()
-                .filter(podcast ->podcast.getUser().equals(user) && podcast.getNews().equals(news)
+                .filter(podcast ->podcast.getUser().equals(user)
                         && podcast.getContentForm().equals(podcastRequest.getContentForm()))
                 .toList();
 
