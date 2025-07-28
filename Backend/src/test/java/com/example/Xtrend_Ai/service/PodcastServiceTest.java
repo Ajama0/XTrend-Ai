@@ -9,6 +9,7 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.enums.ContentForm;
+import com.example.Xtrend_Ai.enums.Status;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
@@ -160,7 +161,39 @@ class PodcastServiceTest {
     }
 
     @Test
-    void podcastStatus() {
+    void EmailNotificationSentWhenPodcastStatusIsComplete() {
+        //given
+        Podcast podcast = mock(Podcast.class);
+        User user = mock(User.class);
+        PodcastResponse podcastResponse = mock(PodcastResponse.class);
+        when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(podcast));
+        when(podcast.getStatus()).thenReturn(Status.COMPLETED);
+        doReturn(podcastResponse).when(underTest).getPodcast(anyLong());
+        when(podcast.getUser()).thenReturn(user);
+        when(user.getFirstname()).thenReturn("tester");
+
+
+        //when
+        underTest.podcastStatus(anyLong());
+
+        //then
+        verify(mailService).sendMail(anyString(), anyString(),anyString());
+
+    }
+
+    @Test
+    void EmailNotificationSentNotSentWhenPodcastStatusIsNotComplete() {
+        //given
+        Podcast podcast = mock(Podcast.class);
+        when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(podcast));
+
+        //when
+        underTest.podcastStatus(anyLong());
+
+        //then
+        ///ensure this was not called
+        verify(mailService, times(0)).sendMail(anyString(), anyString(),anyString());
+
     }
 
     @Test
