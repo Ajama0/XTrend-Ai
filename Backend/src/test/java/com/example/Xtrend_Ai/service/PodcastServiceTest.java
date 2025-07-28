@@ -15,6 +15,7 @@ import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.example.Xtrend_Ai.utils.Article;
 import jdk.jshell.spi.ExecutionControl;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,10 +23,13 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
+import java.net.URI;
+import java.net.URL;
 import java.util.Optional;
 import java.util.function.Consumer;
 
@@ -196,8 +200,24 @@ class PodcastServiceTest {
 
     }
 
+    @SneakyThrows
     @Test
-    void getPodcast() {
+    void CheckIfWeCanGetPodcastWithoutExceptions() {
+        //given
+        Podcast podcast = mock(Podcast.class);
+        URL url = new URL("https://testing.com");
+        when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(podcast));
+        when(s3Service.getPresignedForObject(anyString(), anyString())).thenReturn(url);
+        when(podcast.getId()).thenReturn(1L);
+        when(podcast.getKey()).thenReturn("test-key");
+        ReflectionTestUtils.setField(underTest, "bucketName", "test-bucket");
+
+        //when & then
+        underTest.getPodcast(1L);
+
+        ArgumentCaptor<String> s3captor = ArgumentCaptor.forClass(String.class);
+        verify(s3Service, times(1)).getPresignedForObject(anyString(), s3captor.capture());
+        assertEquals("podcast/audio/1/test-key", s3captor.getValue());
     }
 
     @Test
