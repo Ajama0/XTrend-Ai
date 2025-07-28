@@ -204,18 +204,15 @@ public class PodcastService {
         User user = userRepository.findByEmail(podcastRequest.getEmail()).
                 orElseThrow(()->new UsernameNotFoundException("User not found"));
 
-        News news = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new ArticleNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
-
-        /// user has maximum of 2 generated podcasts for the same article and same Form of content
-        /// content can be short Form or Long form
-        /// user X can generate long form/short form podcasts from the same article a maximum of twice
+        /// user has maximum of 2 generated podcasts for each form of content(short or long)
+        /// user has can have 2 long form podcasts and 2 short form (free version) for any article
         List<Podcast> podcastsGenerated = podcastRepository.findAll()
                 .stream()
                 .filter(podcast ->podcast.getUser().equals(user)
                         && podcast.getContentForm().equals(podcastRequest.getContentForm()))
                 .toList();
 
-        if (podcastsGenerated.size() >=10) {
+        if (podcastsGenerated.size() >=2) {
             String alternative;
             if(podcastRequest.getContentForm() == ContentForm.LONG){
                 alternative = ContentForm.SHORT.toString();

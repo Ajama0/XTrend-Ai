@@ -30,8 +30,11 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -221,10 +224,44 @@ class PodcastServiceTest {
     }
 
     @Test
-    void podcastLimitReached() {
+    void shouldReturnLimitReachedWhenUserHasTenPodcastsWithSameForm() {
+        // given
+        User user = new User();
+        PodcastRequest request = PodcastRequest.builder()
+                .email("user@example.com")
+                .contentForm(ContentForm.LONG)
+                .build();
+
+        List<Podcast> podcasts = IntStream.range(0, 2)
+                .mapToObj(i -> {
+                    Podcast p = mock(Podcast.class);
+                    when(p.getUser()).thenReturn(user);
+                    when(p.getContentForm()).thenReturn(ContentForm.LONG);
+                    return p;
+                })
+                .collect(Collectors.toList());
+
+        when(userRepository.findByEmail("user@example.com")).thenReturn(Optional.of(user));
+        when(podcastRepository.findAll()).thenReturn(podcasts);
+
+        // when
+        PodcastLimitResponse response = underTest.podcastLimitReached(request);
+
+        // then
+        assertTrue(response.getLimitReached());
+        assertTrue(response.getMessage().contains("you have reached the maximum limit"));
     }
 
     @Test
-    void deletePodcast() {
+    void EnsurePodcastCannotBeDeletedDuringProcessing() {
+        Podcast podcast = mock(Podcast.class);
+
+        when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(podcast));
+        when(podcast.getStatus()).thenReturn(Status.PROCESSING);
+
+        assertThrows(IllegalArgumentException.class, () -> underTest.deletePodcast(1L));
+
+        verify(s3Service,times(0)).DeleteObject(anyString(),anyString());
+
     }
 }
