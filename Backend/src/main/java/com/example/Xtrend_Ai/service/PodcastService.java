@@ -65,7 +65,7 @@ public class PodcastService {
 
 
             /// check for limit reached before generating
-            PodcastLimitResponse limit= PodcastLimitReached(podcastRequest);
+            PodcastLimitResponse limit= podcastLimitReached(podcastRequest);
             if(limit.getLimitReached().equals(Boolean.TRUE)) {
                 return PodcastResponse.builder().build();
             }
@@ -199,7 +199,7 @@ public class PodcastService {
      * @param podcastRequest - validate if limit has been reached
      * @return Boolean of True if limit reached
      */
-    public PodcastLimitResponse PodcastLimitReached(PodcastRequest podcastRequest) {
+    public PodcastLimitResponse podcastLimitReached(PodcastRequest podcastRequest) {
 
         User user = userRepository.findByEmail(podcastRequest.getEmail()).
                 orElseThrow(()->new UsernameNotFoundException("User not found"));

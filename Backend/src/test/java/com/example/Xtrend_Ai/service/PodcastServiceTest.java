@@ -2,18 +2,35 @@ package com.example.Xtrend_Ai.service;
 
 import com.example.Xtrend_Ai.Aws.S3Service;
 import com.example.Xtrend_Ai.Mail.MailService;
+import com.example.Xtrend_Ai.dto.PodcastLimitResponse;
+import com.example.Xtrend_Ai.dto.PodcastRequest;
+import com.example.Xtrend_Ai.dto.PodcastResponse;
+import com.example.Xtrend_Ai.entity.News;
+import com.example.Xtrend_Ai.entity.Podcast;
+import com.example.Xtrend_Ai.entity.User;
+import com.example.Xtrend_Ai.enums.ContentForm;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
+import com.example.Xtrend_Ai.utils.Article;
 import jdk.jshell.spi.ExecutionControl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.Disposable;
+import reactor.core.publisher.Mono;
+
+import java.util.Optional;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PodcastServiceTest {
@@ -41,16 +58,105 @@ class PodcastServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = new PodcastService(webClient, podcastRepository, newsRepository, userRepository, s3Service, mailService);
+        underTest = Mockito.spy(new PodcastService(webClient, podcastRepository, newsRepository, userRepository, s3Service, mailService));
 
     }
 
     @Test
-    void generatePodcast() {
+    void EnsureUserCannotGeneratePodcastWhenLimitHasBeenExceeded() {
+        //given
+        News news = new News();
+        User user = new User();
+        PodcastRequest podcastRequest = PodcastRequest.builder()
+                .articleUrl("/times.com")
+                .email("testing@example.com")
+                .contentForm(ContentForm.LONG)
+                .newsId(1L)
+                .build();
+
+        PodcastLimitResponse limitResponse = mock(PodcastLimitResponse.class);
+        when(newsRepository.findById(any(Long.class))).thenReturn(Optional.of(news));
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        doReturn(limitResponse).when(underTest).podcastLimitReached(any(PodcastRequest.class));
+        when(limitResponse.getLimitReached()).thenReturn(true);
+
+        //when
+        PodcastResponse podcastResponse = underTest.generatePodcast(podcastRequest);
+
+        //then
+        verify(podcastRepository, times(0)).save(any(Podcast.class));
+        assertNull(podcastResponse.getStatus());
+        assertNull(podcastResponse.getPodcastId());
+        assertNull(podcastResponse.getUrl());
+    }
+
+    @Test
+    void EnsurePodcastIsGeneratedWhenLimitHasNotBeenExceeded() {
+        //given
+        User user = new User();
+        News news = mock(News.class);
+        Article article = mock(Article.class);
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+        Mono<byte[]> mockMono = mock(Mono.class);
+
+
+
+        PodcastRequest podcastRequest = PodcastRequest
+                .builder()
+                .email("tester123@exmaple.com")
+                .contentForm(ContentForm.SHORT)
+                .newsId(2L)
+                .build();
+        PodcastLimitResponse limitResponse = mock(PodcastLimitResponse.class);
+
+
+        when(newsRepository.findById(eq(2L))).thenReturn(Optional.of(news));
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.of(user));
+        when(news.getArticle()).thenReturn(article);
+        when(limitResponse.getLimitReached()).thenReturn(false);
+        when(webClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri(anyString())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.contentType(any())).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.bodyValue(any())).thenReturn(requestHeadersSpec);
+        when(requestHeadersSpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.bodyToMono(byte[].class)).thenReturn(mockMono);
+        when(mockMono.subscribe(any(Consumer.class)))
+                .thenReturn(mock(Disposable.class));
+
+
+        doReturn(limitResponse).when(underTest).podcastLimitReached(any(PodcastRequest.class));
+
+
+        //when
+        underTest.generatePodcast(podcastRequest);
+        ArgumentCaptor<Podcast> podcastCaptor = ArgumentCaptor.forClass(Podcast.class);
+
+        //then
+        verify(podcastRepository,times(1)).save(podcastCaptor.capture());
+        verify(webClient, times(1)).post();
+        Podcast podcast = podcastCaptor.getValue();
+
+        assertNotNull(podcast);
     }
 
     @Test
     void uploadPodcast() {
+
+        //given
+        String bucketName = "test-bucket";
+        String key = "test-key";
+        byte[] bytes = new byte[8];
+        when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(new Podcast()));
+
+        //when
+        underTest.uploadPodcast(bucketName,1L, key, bytes);
+        String expectedPath = "podcast/audio/" + 1L + "/" + key;
+
+        //then
+        verify(s3Service).putObject(bucketName, expectedPath, bytes);
+        verify(podcastRepository).save(any(Podcast.class));
     }
 
     @Test
