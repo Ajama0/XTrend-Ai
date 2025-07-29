@@ -19,6 +19,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Builder
 public class Article {
 
 
@@ -57,6 +58,8 @@ public class Article {
     @ElementCollection
     private List<String> category;
 
+
+    private Long newsId;
 
 
 

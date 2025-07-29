@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.controller;
 
 
 import com.example.Xtrend_Ai.dto.ArticleResponse;
+import com.example.Xtrend_Ai.dto.NewsDTO;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.News;
@@ -23,30 +24,10 @@ import java.util.List;
 public class NewsController {
 
     private final NewsApiService newsApiService;
-    public NewsController(NewsApiService newsApiService, DiffBotService diffBotService) {
+    public NewsController(NewsApiService newsApiService) {
         this.newsApiService = newsApiService;
     }
 
-
-    @GetMapping(path="/trending")
-    public ResponseEntity<NewsResponse> getTrendingNews() throws IOException {
-        NewsResponse newsResponse = newsApiService.getNews();
-        return new ResponseEntity<>(newsResponse, HttpStatus.OK);
-
-    }
-
-
-//    @GetMapping(path="/")
-//    public ResponseEntity<List<NewsResponse>> persistTrendingNews() {
-//        /**
-//         *
-//         * we can define query parameters that we need when making the call to the news api
-//         */
-//        List<NewsResponse> response = newsApiService.getTopHeadlines();
-//        return new ResponseEntity<>(response, HttpStatus.OK);
-//
-//
-//    }
 
 
         /**
@@ -54,8 +35,8 @@ public class NewsController {
          * @return
          */
         @GetMapping(path = "all/articles")
-        public ResponseEntity<List<News>> getAllTrendingNews () {
-            List<News> trending = newsApiService.findAllNews();
+        public ResponseEntity<NewsDTO> getAllTrendingNews () {
+            NewsDTO trending = newsApiService.findAllNews();
             return ResponseEntity.ok(trending);
 
         }

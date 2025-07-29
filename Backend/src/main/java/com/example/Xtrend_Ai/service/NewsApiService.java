@@ -1,9 +1,11 @@
 package com.example.Xtrend_Ai.service;
 import com.example.Xtrend_Ai.client.NewsApi.ApiClient;
+import com.example.Xtrend_Ai.dto.NewsDTO;
 import com.example.Xtrend_Ai.dto.NewsRequest;
 import com.example.Xtrend_Ai.dto.NewsResponse;
 import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
+import com.example.Xtrend_Ai.mapper.NewsMapper;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.utils.Article;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,42 +39,6 @@ public class NewsApiService {
     private final ObjectMapper objectMapper;
 
 
-    public NewsResponse getNews() throws IOException {
-        NewsRequest newsRequest = NewsRequest
-                .builder()
-                .country(List.of("gb,us,ca"))
-                .Language("en")
-                .category(List.of("politics", "sports", "business", "entertainment","technology"))
-                .image("1")
-                .priorityDomain("medium")
-                .removeDuplicate("1")
-                .build();
-
-        /// convert lists into strings
-        String category = String.join(",", newsRequest.getCategory());
-        String country = String.join(",", newsRequest.getCountry());
-
-        HttpUrl baseUrl = HttpUrl.parse("https://newsdata.io/api/1/latest");
-        HttpUrl.Builder builder = baseUrl.newBuilder().addQueryParameter("apikey", newsApiKey)
-                .addQueryParameter("country", country)
-                .addQueryParameter("language", newsRequest.getLanguage())
-                .addQueryParameter("category",category)
-                .addQueryParameter("image", newsRequest.getImage())
-                .addQueryParameter("removeduplicate", newsRequest.getRemoveDuplicate())
-                .addQueryParameter("prioritydomain", newsRequest.getPriorityDomain());
-
-        HttpUrl url = builder.build();
-
-
-        ResponseBody responseBody = apiClient.fetchTopStories(url);
-        String body = responseBody.string();
-        log.info("NewsApiService getNews body: {}", body);
-        NewsResponse newsResponse = objectMapper.readValue(body, NewsResponse.class);
-
-        return newsResponse;
-
-    }
-
 
 
     //@Scheduled(fixedDelay = 1000 * 60 * 60)
@@ -95,8 +61,6 @@ public class NewsApiService {
 
     public void GetLatestNews(HttpUrl baseUrl, String nextPage, int requestCount) throws IOException {
         log.info("inside recursive function");
-
-
 
 
         /// here we use the api client to return an impl of the base ApiService.
@@ -159,8 +123,6 @@ public class NewsApiService {
 
 
 
-
-
     public void saveNews(NewsResponse newsResponse) {
     if (newsResponse == null || newsResponse.getResults().isEmpty()) {
         throw new IllegalArgumentException("no Articles were  found");
@@ -182,12 +144,12 @@ public class NewsApiService {
      *
      * @return a list of news objects
     */
-    public List<News> findAllNews() {
+    public NewsDTO findAllNews() {
         List<News> newsList = newsRepository.findAll();
         if (newsList.isEmpty()) {
         throw new ArticleNotFoundException("no Articles were found");
     }
-    return newsList;
+    return NewsMapper.mapNewsToDto(newsList);
 
 }
 
