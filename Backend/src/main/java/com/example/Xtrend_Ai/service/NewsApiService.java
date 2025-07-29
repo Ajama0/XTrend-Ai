@@ -40,7 +40,6 @@ public class NewsApiService {
 
 
 
-
     //@Scheduled(fixedDelay = 1000 * 60 * 60)
     //@Async
     public void defineBase() throws IOException {
@@ -61,6 +60,8 @@ public class NewsApiService {
 
     public void GetLatestNews(HttpUrl baseUrl, String nextPage, int requestCount) throws IOException {
         log.info("inside recursive function");
+
+
 
 
         /// here we use the api client to return an impl of the base ApiService.
@@ -123,6 +124,8 @@ public class NewsApiService {
 
 
 
+
+
     public void saveNews(NewsResponse newsResponse) {
     if (newsResponse == null || newsResponse.getResults().isEmpty()) {
         throw new IllegalArgumentException("no Articles were  found");
@@ -138,20 +141,19 @@ public class NewsApiService {
 
 
 
-
     /**
      * allows us to fetch all the persisted news
      *
      * @return a list of news objects
-    */
+     */
     public NewsDTO findAllNews() {
         List<News> newsList = newsRepository.findAll();
         if (newsList.isEmpty()) {
-        throw new ArticleNotFoundException("no Articles were found");
-    }
-    return NewsMapper.mapNewsToDto(newsList);
+            throw new ArticleNotFoundException("no Articles were found");
+        }
+        return NewsMapper.mapNewsToDto(newsList);
 
-}
+    }
 
 
 

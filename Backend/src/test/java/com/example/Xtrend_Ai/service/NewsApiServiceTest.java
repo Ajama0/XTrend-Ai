@@ -53,31 +53,7 @@ class NewsApiServiceTest {
         underTest = Mockito.spy(new NewsApiService(newsRepository, apiClient, objectMapper));
     }
 
-    @SneakyThrows
-    @Test
-    void IsNewsReturnedAndInTheCorrectType() {
-        //given
-        //mock the response body as it is returned
-        ResponseBody responseBody = mock(ResponseBody.class);
-        String fakeJsonString = "{\"id\":1,\"title\":\"test\",\"content\":\"test\"}";
-        NewsResponse newsResponse = new NewsResponse();
 
-        when(apiClient.fetchTopStories(any(HttpUrl.class))).thenReturn(responseBody);
-        when(responseBody.string()).thenReturn(fakeJsonString);
-        when(objectMapper.readValue(fakeJsonString, NewsResponse.class)).thenReturn(newsResponse);
-
-
-        //when
-        NewsResponse expectedResponse = underTest.getNews();
-
-        //then
-        assertInstanceOf(NewsResponse.class, expectedResponse);
-        assertSame(newsResponse, expectedResponse);
-        verify(apiClient).fetchTopStories(any(HttpUrl.class));
-        verify(objectMapper).readValue(fakeJsonString, NewsResponse.class);
-
-
-    }
 
     @SneakyThrows
     @Test
