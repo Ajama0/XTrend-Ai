@@ -8,6 +8,8 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { NewsDTO } from '../models/newsDTO';
 import { PodcastResponse } from '../models/PodcastResponse';
+import { PodcastService } from '../services/podcast.service';
+import { PodcastRequest } from '../models/PodcastRequest';
 
 
 @Component({
@@ -26,7 +28,7 @@ export class NewsComponent implements OnInit{
   @Input() description!: string;
   @Input() image!: string;
   @Input() url!: string; // URL of the news article
-  @Input() newsId:number
+  @Input() newsId!:number
 
   @Output() newsClicked = new EventEmitter<string>();
   @Output() articlesEmitted = new EventEmitter<NewsDTO>();
@@ -54,9 +56,6 @@ onCardClick() {
 
   }
 
-  
-
-
   }
 
 
@@ -64,8 +63,6 @@ onCardClick() {
     //this.action = null;
     
   }
-  
-
 
   
 
@@ -106,8 +103,70 @@ onCardClick() {
 
 
 
-  generatePodcast(){
-    this.podcast$ = this.podcastService.createPodcast()
+  generatePodcast():void{
+    //**
+    // we call podcast service to generate a podcast
+    // we return a podcast response which contains the information for polling
+    // we use this response to poll the backend for the podcast status
+    // */
+    
+    const podcastRequest :PodcastRequest = 
+    {
+      newsId : this.newsId,
+      email :"harry@example.com",
+      contentForm: "SHORT"
+    }
+  
+    this.podcast$ = this.podcastService.createPodcast(podcastRequest);
+
+    this.podcast$.subscribe({
+      next:(response:PodcastResponse)=>{
+        if(response !== null && response !== undefined){
+        //now we can pass this podcast response for polling
+        this.pollPodcastStatus(response)
+      }else{
+        throw new Error("Podcast response is null or undefined")
+      }
+
+    },error:(err:Error)=>{
+      throw new Error("Failed to create podcast: " + err.message)
+    }
+    })
+
+  
+  }
+  /**
+   * This method will poll the backend for the podcast status
+   * we can use setInterval to poll the backend every few seconds
+   * 
+   * @param podcastResponse  - referes ti the response from the backend
+   */
+  pollPodcastStatus(podcastResponse: PodcastResponse): void {
+
+    console.log("Polling for podcast status with ID:", podcastResponse.podcastId);
+    const intervalId = setInterval(() => {
+      this.podcastService.getPodcastStatus(podcastResponse.podcastId).subscribe({
+        next: (response: PodcastResponse) => {
+          console.log("Current podcast status:", response.status);
+          if (response.status === 'COMPLETED' || response.status === 'FAILED') {
+            console.log("Final podcast status:", response.status);
+            clearInterval(intervalId);
+            if(response.status === 'COMPLETED'){
+              console.log("Podcast URL:", response.url);
+              this.router.navigate(['/podcast-player', response.podcastId]); // Navigate to the podcast page
+            }else if(response.status === 'FAILED'){
+              console.error("Podcast generation failed.");
+              //handle failure case and see why. e.g., show an error message to the user
+            }
+          }
+        },
+        error: (err: Error) => {
+          console.error("Error fetching podcast status:", err.message);
+          clearInterval(intervalId); // Stop polling on error
+        }
+      });
+    }, 1500); // Poll every 15 seconds, for long form content make it more. 
+   
   }
 
 

@@ -34,7 +34,7 @@ export const routes: Routes = [
         component: VideogenComponent },
 
         {
-            path: 'podcast-player',
+            path: 'podcast-player/:id',
             component:PodcastComponent
         },
         {

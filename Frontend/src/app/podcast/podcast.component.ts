@@ -1,6 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
+import { PodcastService } from '../services/podcast.service';
+import { Observable } from 'rxjs';
+import { PodcastResponse } from '../models/PodcastResponse';
 
 @Component({
   selector: 'app-podcast',
@@ -9,27 +12,55 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './podcast.component.css'
 })
 export class PodcastComponent {
-  audioUrl: string = '';
+  audioUrl!:string;
   title = 'SpaceX launches 21 Starlink satellites on Falcon 9 rocket, lands booster on ship at sea - Space.com';
   description = 'It was SpaceXs 41st Falcon 9 mission of the year.';
   duration = 332; // in seconds
   category = 'Technology';
   generatedAt = '2 minutes ago';
-  url :string =  "https://cdn.mos.cms.futurecdn.net/u4riJDr7eyvWSGFuk9vsCe-1200-80.jpg"
+  url !:string 
 
   currentTime = 0;
   isPlaying = false;
   volume = 75;
   isMuted = false;
 
-  constructor(private route: ActivatedRoute) {}
+  podcast$!:Observable<PodcastResponse>
+
+  constructor(private route: ActivatedRoute, private podcastService:PodcastService) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(params => {
-      this.audioUrl = params['audio'];
-      console.log('Received audio URL:', this.audioUrl);
-    });
+    const podcastId = this.route.snapshot.paramMap.get("id")
+    if(podcastId){
+      this.podcast$ = this.podcastService.getPresignedUrl(podcastId)
+    }
   }
+
+
+  recievePodcast():void{
+    this.podcast$.subscribe({
+      next:(response:PodcastResponse)=>{
+        if(response !== null && response !== undefined){
+          this.audioUrl = response.url ?? '';
+          console.log("Podcast URL:", this.audioUrl);
+        }else{
+          throw new Error("Podcast response is null or undefined")
+        }
+      },
+      error:(err:Error)=>{
+        console.error("Error fetching podcast:", err);
+      }
+    })
+  }
+
+
+
+
+
+
+
+
+
   formatTime(seconds: number): string {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -39,6 +70,7 @@ export class PodcastComponent {
   togglePlay(audio: HTMLAudioElement) {
     this.isPlaying = !this.isPlaying;
     this.isPlaying ? audio.play() : audio.pause();
+    
   }
 
   skipForward(audio: HTMLAudioElement) {
