@@ -1,6 +1,8 @@
 export interface PodcastResponse{
-    id:number;
+    podcastId:number;
     key:string;
     status:string;
+
+    url?:string
 
 }
