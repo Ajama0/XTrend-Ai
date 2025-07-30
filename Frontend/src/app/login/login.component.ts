@@ -74,6 +74,7 @@ export class LoginComponent implements OnInit{
 
   //on form submission this is called. 
   validateForm(){
+    console.log("does this fucntion run?")
     if(this.userReturned && this.loginForm.valid){
       /** 
       console.log(this.loginForm.controls['email'].value)

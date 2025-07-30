@@ -1,19 +1,17 @@
-export interface Articles{
+export interface Articles {
+  link: string;
+  title: string;
+  country: string[];      
+  description: string;
+  image_url: string;
+  pubDate: string;
+  category: string[];         
+  source_name: string;
+  source_icon: string;
+  language: string;
+  newsId: number;
 
-
-    source ?: Source
-    author ?:string
-    title :string
-    description : string
-    url : string
-    urlToImage : string 
-    publishedAt ?: string
-    content ?: string
-  
-   
 }
 
-export interface Source{
-    id : string
-    name : string
-}
+
+    

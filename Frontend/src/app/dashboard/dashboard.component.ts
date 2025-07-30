@@ -3,6 +3,7 @@ import { NewsComponent } from '../news/news.component';
 import { Articles } from '../models/Articles';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { NewsDTO } from '../models/newsDTO';
 
 @Component({
   selector: 'app-dashboard',
@@ -15,9 +16,9 @@ export class DashboardComponent {
   constructor(private router: Router) {}
   dashboardArticles: Articles[] = [];
 
-  receiveArticles(articles: Articles[]) {
-    this.dashboardArticles = articles;
-    console.log("Received articles in dashboard:", articles);
+  receiveArticles(news: NewsDTO) {
+    this.dashboardArticles = news.article
+    console.log("event emitted from news component, articles received in dashboard component");
   }
 
 

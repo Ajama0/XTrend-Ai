@@ -48,8 +48,9 @@
         <app-news
           [title]="article.title || ''"
           [description]="article.description || ''"
-          [image]="article.urlToImage || ''"
-          [url]="article.url"
+          [image]="article.image_url || ''"
+          [url]="article.link"
+          [newsId] = "article.newsId"
         ></app-news>
       </div>
     </div>
