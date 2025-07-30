@@ -11,6 +11,7 @@ import java.net.URL;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Setter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PodcastResponse {
 

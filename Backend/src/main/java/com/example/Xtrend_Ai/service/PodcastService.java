@@ -87,7 +87,7 @@ public class PodcastService {
 
                 log.info(" podcast request {}", podcastRequest);
 
-
+                log.info("about to call async function");
                 client.post()
                         .uri("/generate-podcast")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,9 +103,9 @@ public class PodcastService {
                 }
 
             /// returned straight away for client side polling.
+        log.info("returning data");
         return PodcastResponse.builder()
                 .podcastId(podcast.getId())
-                .key(podcast.getKey())
                 .status(podcast.getStatus())
                 .build();
     }
@@ -142,8 +142,6 @@ public class PodcastService {
         ));
 
         if(podcast.getStatus() == Status.COMPLETED) {
-            PodcastResponse podcastResponse = getPodcast(podcastId);
-            /// as soon as we fetch the podcast we want to notify the user via mail
 
             String bodyFormat = String.format(
                     "Hi %s,\n\n" +
@@ -158,13 +156,13 @@ public class PodcastService {
 
             return PodcastResponse.builder()
                     .status(podcast.getStatus())
-                    .url(podcastResponse.getUrl())
+                    .podcastId(podcast.getId())
                     .build();
         }
         else{
             return PodcastResponse
                     .builder()
-                    .podcastId(podcastId)
+                    .podcastId(podcast.getId())
                     .status(podcast.getStatus())
                     .build();
         }
@@ -176,6 +174,9 @@ public class PodcastService {
         Podcast findPodcast = podcastRepository.findById(podcastId).orElseThrow(()->
                 new PodcastNotFoundException("Podcast with id " + podcastId + " not found"));
 
+        if(!(findPodcast.getStatus() == Status.COMPLETED)) {
+            throw new PodcastNotFoundException("podcast not found in s3, podcast may still be processing");
+        }
 
         String key = "podcast/audio/%s/%s".formatted(findPodcast.getId(), findPodcast.getKey());
         /// presigned url that is a temporary accessible link to our bucket object
@@ -212,7 +213,7 @@ public class PodcastService {
                         && podcast.getContentForm().equals(podcastRequest.getContentForm()))
                 .toList();
 
-        if (podcastsGenerated.size() >=2) {
+        if (podcastsGenerated.size() >=10000) {
             String alternative;
             if(podcastRequest.getContentForm() == ContentForm.LONG){
                 alternative = ContentForm.SHORT.toString();

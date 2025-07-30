@@ -172,10 +172,8 @@ class PodcastServiceTest {
         //given
         Podcast podcast = mock(Podcast.class);
         User user = mock(User.class);
-        PodcastResponse podcastResponse = mock(PodcastResponse.class);
         when(podcastRepository.findById(anyLong())).thenReturn(Optional.of(podcast));
         when(podcast.getStatus()).thenReturn(Status.COMPLETED);
-        doReturn(podcastResponse).when(underTest).getPodcast(anyLong());
         when(podcast.getUser()).thenReturn(user);
         when(user.getFirstname()).thenReturn("tester");
 
