@@ -52,8 +52,8 @@ onCardClick() {
       this.router.navigate(['/generate-blog', 14]); // hardcoded ID for demonstration, replace with actual ID as needed   
     }
     else{
+      this.generatePodcast()
     
-
   }
 
   }
@@ -152,7 +152,6 @@ onCardClick() {
             console.log("Final podcast status:", response.status);
             clearInterval(intervalId);
             if(response.status === 'COMPLETED'){
-              console.log("Podcast URL:", response.url);
               this.router.navigate(['/podcast-player', response.podcastId]); // Navigate to the podcast page
             }else if(response.status === 'FAILED'){
               console.error("Podcast generation failed.");
@@ -165,7 +164,7 @@ onCardClick() {
           clearInterval(intervalId); // Stop polling on error
         }
       });
-    }, 1500); // Poll every 15 seconds, for long form content make it more. 
+    }, 20000); // Poll every 15 seconds, for long form content make it more. 
    
   }
 

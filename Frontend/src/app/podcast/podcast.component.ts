@@ -18,7 +18,7 @@ export class PodcastComponent {
   duration = 332; // in seconds
   category = 'Technology';
   generatedAt = '2 minutes ago';
-  url !:string 
+  imageUrl!:String
 
   currentTime = 0;
   isPlaying = false;
@@ -31,8 +31,10 @@ export class PodcastComponent {
 
   ngOnInit(): void {
     const podcastId = this.route.snapshot.paramMap.get("id")
+    console.log("Podcast ID from route:", podcastId);
     if(podcastId){
       this.podcast$ = this.podcastService.getPresignedUrl(podcastId)
+      this.recievePodcast();
     }
   }
 
@@ -41,8 +43,11 @@ export class PodcastComponent {
     this.podcast$.subscribe({
       next:(response:PodcastResponse)=>{
         if(response !== null && response !== undefined){
+          console.log("response from s3 download:", response);
           this.audioUrl = response.url ?? '';
           console.log("Podcast URL:", this.audioUrl);
+          this.imageUrl = response.imageUrl ?? '';
+
         }else{
           throw new Error("Podcast response is null or undefined")
         }

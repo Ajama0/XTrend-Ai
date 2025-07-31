@@ -28,9 +28,10 @@ export class PodcastService {
       return this.http.get<PodcastResponse>(`${this.api_base}/podcast/status/${id}`);
     }
     
-      getPresignedUrl(id: string): Observable<PodcastResponse> {
-        const endpoint = `${this.api_base}/podcast/download/${id}`;
-        return this.http.get<PodcastResponse>(endpoint);
+    getPresignedUrl(id: string): Observable<PodcastResponse> {
+      const endpoint = `${this.api_base}/podcast/download/${id}`;
+      console.log(endpoint)
+      return this.http.get<PodcastResponse>(endpoint);
   }
 
   }

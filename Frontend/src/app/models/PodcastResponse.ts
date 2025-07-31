@@ -5,4 +5,9 @@ export interface PodcastResponse{
 
     url?:string
 
+    imageUrl?:string
+    description?:string
+    country?:Array<string>
+    category?:Array<string>
+
 }

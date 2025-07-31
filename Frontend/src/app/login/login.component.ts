@@ -67,7 +67,7 @@ export class LoginComponent implements OnInit{
   }
 
   Homepage(){
-    this.router.navigate(['/dashboard'])
+    this.router.navigate(['/dashboard'], {replaceUrl:true})
 
 
   }
