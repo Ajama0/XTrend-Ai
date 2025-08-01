@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.net.URL;
+import java.util.List;
 
 @Getter
 @ToString
@@ -23,5 +24,12 @@ public class PodcastResponse {
     private Status status;
 
     private String url;
+
+    private String title;
+    private String description;
+    private String imageUrl;
+    private List<String> country;
+    private List<String>category;
+
 
 }

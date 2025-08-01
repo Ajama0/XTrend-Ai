@@ -31,7 +31,13 @@ public class News {
     private Long id;
 
 
-
+    @Embedded
     private Article article;
+
+    @ElementCollection
+    private List<String> country;
+
+    @ElementCollection
+    private List<String> category;
 
 }

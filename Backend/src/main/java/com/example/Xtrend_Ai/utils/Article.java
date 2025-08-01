@@ -52,10 +52,10 @@ public class Article {
 
     private String language;
 
-    @ElementCollection
+    @Transient
     private List<String>country;
 
-    @ElementCollection
+    @Transient
     private List<String> category;
 
 

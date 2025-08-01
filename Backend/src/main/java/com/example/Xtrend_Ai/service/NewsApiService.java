@@ -134,6 +134,8 @@ public class NewsApiService {
     for (Article article : newsResponse.getResults()) {
         News news = News.builder()
                 .article(article)
+                .category(article.getCategory())
+                .country(article.getCountry())
                 .build();
         newsRepository.save(news);
     }
