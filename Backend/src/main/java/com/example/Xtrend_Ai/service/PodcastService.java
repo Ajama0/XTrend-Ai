@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -253,6 +254,20 @@ public class PodcastService {
             s3Service.DeleteObject(bucketName, key);
             podcastRepository.deleteById(podcastId);
         }
+
+    }
+
+
+    /**
+     *
+     * @param type - either an Image or PDF
+     * @param file - the content to be used for podcast generation
+     * @param user - the user making the request
+     * @return - podcast id and status used for polling.
+     */
+    public PodcastResponse generatePodcastFromPdfOrImage(String type, MultipartFile file, String user, String contentForm) {
+
+
 
     }
 }

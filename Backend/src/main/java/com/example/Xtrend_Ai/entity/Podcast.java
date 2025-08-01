@@ -1,6 +1,7 @@
 package com.example.Xtrend_Ai.entity;
 
 import com.example.Xtrend_Ai.enums.ContentForm;
+import com.example.Xtrend_Ai.enums.PodcastType;
 import com.example.Xtrend_Ai.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,4 +44,9 @@ public class Podcast {
     @ManyToOne
     @JoinColumn(name="news_id")
     private News news;
+
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private PodcastType podcastType;
 }
