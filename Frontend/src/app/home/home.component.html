@@ -50,6 +50,8 @@
     </div>
   </section>
 
+
+
   <!-- Audio Player (fixed at bottom) -->
   <div *ngIf="currentPodcast" class="fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg shadow-lg border-t border-gray-200 z-50 flex items-center px-6 py-4">
     <img [src]="currentPodcast.image" alt="Podcast" class="w-12 h-12 rounded-xl mr-4" />
@@ -71,5 +73,16 @@
       </svg>
     </button>
     <span class="text-xs text-gray-400">{{currentPodcast.duration}}</span>
+  </div>
+
+    <!-- Vertically stacked hero-style feature cards -->
+  <div class="w-full">
+    <app-featurecard
+      *ngFor="let feature of features"
+      [title]="feature.title"
+      [description]="feature.description"
+      [image]="feature.image"
+      [badgeText]="feature.badgeText">
+    </app-featurecard>
   </div>
 </div>

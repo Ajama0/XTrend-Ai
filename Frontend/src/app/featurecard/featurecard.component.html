@@ -1,0 +1,13 @@
+<!-- Hero-style Feature Card Section -->
+ <section class="w-full flex justify-center bg-gradient-to-r from-indigo-50 via-blue-100 to-pink-50">
+  <div class="max-w-6xl w-full py-24 px-4 flex flex-col md:flex-row items-center gap-8">
+    <div class="flex-1 flex flex-col gap-4 md:pr-8">
+      <span *ngIf="badgeText" class="bg-indigo-100 text-indigo-600 text-base font-bold px-4 py-2 rounded-full w-fit mb-4">{{ badgeText }}</span>
+      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4" style="font-family: 'Inter', sans-serif;">{{ title }}</h2>
+      <p class="text-gray-600 text-lg md:text-xl leading-normal md:leading-relaxed" style="font-family: 'Inter', sans-serif;">{{ description }}</p>
+    </div>
+    <div class="flex-1 flex justify-end items-center">
+      <img *ngIf="image" [src]="image" alt="Feature" class="w-full max-w-lg h-auto object-cover" />
+    </div>
+  </div>
+</section>
