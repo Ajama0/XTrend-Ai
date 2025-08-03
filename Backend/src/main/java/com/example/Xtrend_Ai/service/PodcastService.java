@@ -10,6 +10,7 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.enums.ContentForm;
+import com.example.Xtrend_Ai.enums.PodcastType;
 import com.example.Xtrend_Ai.enums.Status;
 import com.example.Xtrend_Ai.exceptions.ArticleNotFoundException;
 import com.example.Xtrend_Ai.exceptions.AudioNotFoundException;
@@ -21,8 +22,10 @@ import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -55,9 +58,13 @@ public class PodcastService {
     @Value("${bucket.name}")
     private String bucketName;
 
-    public PodcastResponse generatePodcast(PodcastRequest podcastRequest)  {
+    @SneakyThrows
+    public PodcastResponse generatePodcastFromNews(PodcastRequest podcastRequest) {
 
-
+            /// ensure only newsId is present
+            if(podcastRequest.getPodcastType().equals(PodcastType.NEWS) && podcastRequest.getNewsId()==null){
+                throw new BadRequestException("newsId is required for news podcast");
+            }
             News news  = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new
                     PodcastNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
 
@@ -76,6 +83,7 @@ public class PodcastService {
                     .key(keyNumber)
                     .date(LocalDateTime.now().toString())
                     .news(news)
+                    .podcastType(podcastRequest.getPodcastType())
                     .contentForm(podcastRequest.getContentForm())
                     .status(Status.PROCESSING)
                     .user(user)
@@ -260,14 +268,24 @@ public class PodcastService {
 
     /**
      *
-     * @param type - either an Image or PDF
      * @param file - the content to be used for podcast generation
-     * @param user - the user making the request
+     * @param podcastRequest - DTO that contains type, contentform and user
      * @return - podcast id and status used for polling.
      */
-    public PodcastResponse generatePodcastFromPdfOrImage(String type, MultipartFile file, String user, String contentForm) {
+    public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) {
 
 
+
+
+    }
+
+
+    @SneakyThrows
+    public PodcastResponse generatePodcastFromInput(PodcastRequest podcastRequest) {
+        /// ensure input is present
+        if(podcastRequest.getPodcastType().equals(PodcastType.TEXT) && podcastRequest.getText() == null || podcastRequest.getText().isEmpty()){
+            throw new BadRequestException("text field can not be empty");
+        }
 
     }
 }
