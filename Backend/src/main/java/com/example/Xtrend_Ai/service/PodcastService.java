@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import com.example.Xtrend_Ai.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -277,23 +278,13 @@ public class PodcastService {
      * @param podcastRequest - DTO that contains type, contentform and user
      * @return - podcast id and status used for polling.
      */
-    public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) {
+    public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) throws IOException {
         if(podcastRequest.getPodcastType().equals(PodcastType.FILE) && (file ==null || file.isEmpty() )){
             throw new BadRequestException("file is required");
         }
 
-        String filename = Objects.requireNonNull(file.getOriginalFilename());
-
-        if(file.getOriginalFilename().endsWith(".jpg") && podcastRequest.getContentForm().equals(ContentForm.LONG)){
-            throw new BadRequestException("images can only be short form ");
-        }
-
-
-        if(!filename.endsWith(".pdf") && !filename.endsWith("jpg") && !filename.endsWith(".png")
-            && !filename.endsWith(".jpeg")){
-            throw new BadRequestException("files can not be in this format" + filename.substring(filename.indexOf(".")));
-
-        }
+        String filename = getFilename(podcastRequest, file);
+        byte[] fileBytes = file.getBytes();
 
         /// before generating, check the user has not reached his limit
         podcastLimitReached(podcastRequest);
@@ -304,7 +295,7 @@ public class PodcastService {
         String key = UUID.randomUUID().toString();
 
         Podcast podcast = Podcast.builder()
-                .podcastType(PodcastType.FILE)
+                .podcastType(podcastRequest.getPodcastType())
                 .news(null)
                 .user(user)
                 .key(key)
@@ -316,19 +307,22 @@ public class PodcastService {
 
 
 
-
+        log.info(" CONTENT FORM ISSSS{}" ,podcastRequest.getContentForm());
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
-        builder.part("file", file.getResource());
+        builder.part("file", new ByteArrayResource(fileBytes))
+                        .filename(filename);
         builder.part("filename", filename);
         builder.part("contentForm", podcastRequest.getContentForm().toString());
 
         /// we want to make an async call to our podcast api to generate the podcast and save to s3
         client.post()
-                .uri("/api/v1/podcast/create/input")
+                .uri("/api/v1/podcast/create/file")
                 .contentType(MediaType.MULTIPART_FORM_DATA)
-                .bodyValue(BodyInserters.fromMultipartData(builder.build()))
+                .body(BodyInserters.fromMultipartData(builder.build()))
                 .retrieve()
                 .bodyToMono(byte[].class)
+                .doOnError(error -> log.error("Error during async call", error))
+                .doOnSuccess(bytes -> log.info("Successfully received response"))
                 .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), key, bytes));
 
 
@@ -340,6 +334,30 @@ public class PodcastService {
                 .podcastId(podcast.getId())
                 .status(podcast.getStatus())
                 .build();
+    }
+
+
+
+    private String getFilename(PodcastRequest podcastRequest, MultipartFile file) {
+        String filename = Objects.requireNonNull(file.getOriginalFilename());
+
+        if (
+                (file.getOriginalFilename().endsWith(".jpg") ||
+                        file.getOriginalFilename().endsWith(".jpeg") ||
+                        file.getOriginalFilename().endsWith(".png")) &&
+                        podcastRequest.getContentForm().equals(ContentForm.LONG)
+        ) {
+            throw new BadRequestException("images can only be short form");
+        }
+
+
+
+        if(!filename.endsWith(".pdf") && !filename.endsWith("jpg") && !filename.endsWith(".png")
+            && !filename.endsWith(".jpeg")){
+            throw new BadRequestException("files can not be in this format" + filename.substring(filename.indexOf(".")));
+
+        }
+        return filename;
     }
 
 
