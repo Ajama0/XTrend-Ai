@@ -28,7 +28,7 @@ trending_news_config = {
 
 
 
-@app.route('/generate-podcast', methods=['POST'])
+@app.route('api/v1/podcast/create/news', methods=['POST'])
 def generate():
     print("in function -----------------")
     print("Content-Type:", request.content_type)
