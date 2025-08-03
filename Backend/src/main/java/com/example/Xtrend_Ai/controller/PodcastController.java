@@ -49,7 +49,7 @@ public class PodcastController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PostMapping(path="create/from/file", consumes = {MediaType.MULTIPART_FORM_DATA})
+    @PostMapping(path="create/from/file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<PodcastResponse> createPodcastFromFileInputs(
             @RequestPart(name="podcastInfo") PodcastRequest podcastRequest,
             @RequestPart(name="file") MultipartFile file){

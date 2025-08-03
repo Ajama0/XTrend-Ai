@@ -278,8 +278,21 @@ public class PodcastService {
      * @return - podcast id and status used for polling.
      */
     public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) {
-        if(podcastRequest.getPodcastType().equals(PodcastType.FILE) && file ==null || file.isEmpty() ){
+        if(podcastRequest.getPodcastType().equals(PodcastType.FILE) && (file ==null || file.isEmpty() )){
             throw new BadRequestException("file is required");
+        }
+
+        String filename = Objects.requireNonNull(file.getOriginalFilename());
+
+        if(file.getOriginalFilename().endsWith(".jpg") && podcastRequest.getContentForm().equals(ContentForm.LONG)){
+            throw new BadRequestException("images can only be short form ");
+        }
+
+
+        if(!filename.endsWith(".pdf") && !filename.endsWith("jpg") && !filename.endsWith(".png")
+            && !filename.endsWith(".jpeg")){
+            throw new BadRequestException("files can not be in this format" + filename.substring(filename.indexOf(".")));
+
         }
 
         /// before generating, check the user has not reached his limit
@@ -302,10 +315,12 @@ public class PodcastService {
         podcastRepository.save(podcast);
 
 
+
+
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         builder.part("file", file.getResource());
-        builder.part("filename", Objects.requireNonNull(file.getOriginalFilename()));
-        builder.part("form", podcastRequest.getContentForm());
+        builder.part("filename", filename);
+        builder.part("contentForm", podcastRequest.getContentForm().toString());
 
         /// we want to make an async call to our podcast api to generate the podcast and save to s3
         client.post()
@@ -315,6 +330,8 @@ public class PodcastService {
                 .retrieve()
                 .bodyToMono(byte[].class)
                 .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), key, bytes));
+
+
 
 
         /// return response to user to allow polling
@@ -332,6 +349,7 @@ public class PodcastService {
         if(podcastRequest.getPodcastType().equals(PodcastType.TEXT) && podcastRequest.getText() == null || podcastRequest.getText().isEmpty()){
             throw new BadRequestException("Podcast text cannot be empty");
         }
+        return null;
 
     }
 }
