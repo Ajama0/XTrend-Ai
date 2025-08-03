@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("api/v1/podcast")
 @RequiredArgsConstructor
@@ -52,7 +54,7 @@ public class PodcastController {
     @PostMapping(path="create/from/file", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<PodcastResponse> createPodcastFromFileInputs(
             @RequestPart(name="podcastInfo") PodcastRequest podcastRequest,
-            @RequestPart(name="file") MultipartFile file){
+            @RequestPart(name="file") MultipartFile file) throws IOException {
 
         PodcastResponse response = podcastService.generatePodcastFromPdfOrImage(podcastRequest, file);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

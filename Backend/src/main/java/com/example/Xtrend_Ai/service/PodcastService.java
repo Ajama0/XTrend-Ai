@@ -201,12 +201,16 @@ public class PodcastService {
             return PodcastResponse.builder()
                     .podcastId(findPodcast.getId())
                     .url(audioUrl.toString())
-                    .title(findPodcast.getNews().getArticle().getTitle())
-                    .imageUrl(findPodcast.getNews().getArticle().getImage_url())
-                    .country(findPodcast.getNews().getCountry())
-                    .category(findPodcast.getNews().getCategory())
-                    .description(findPodcast.getNews().getArticle().getDescription())
                     .build();
+//            return PodcastResponse.builder()
+//                    .podcastId(findPodcast.getId())
+//                    .url(audioUrl.toString())
+//                    .title(findPodcast.getNews().getArticle().getTitle())
+//                    .imageUrl(findPodcast.getNews().getArticle().getImage_url())
+//                    .country(findPodcast.getNews().getCountry())
+//                    .category(findPodcast.getNews().getCategory())
+//                    .description(findPodcast.getNews().getArticle().getDescription())
+//                    .build();
         }
         else{
             throw new AudioNotFoundException("audio returned from s3 is not found");
