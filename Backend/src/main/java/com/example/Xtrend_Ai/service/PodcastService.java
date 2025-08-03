@@ -25,20 +25,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
-import org.apache.coyote.BadRequestException;
+import com.example.Xtrend_Ai.exceptions.BadRequestException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,7 +63,7 @@ public class PodcastService {
     @Value("${bucket.name}")
     private String bucketName;
 
-    @SneakyThrows
+
     public PodcastResponse generatePodcastFromNews(PodcastRequest podcastRequest) {
 
             /// ensure only newsId is present
@@ -98,7 +103,7 @@ public class PodcastService {
 
                 log.info("about to call async function");
                 client.post()
-                        .uri("/generate-podcast")
+                        .uri("/api/v1/podcast/create/news")
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(podcastRequest)
                         .retrieve()
@@ -273,18 +278,59 @@ public class PodcastService {
      * @return - podcast id and status used for polling.
      */
     public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) {
+        if(podcastRequest.getPodcastType().equals(PodcastType.FILE) && file ==null || file.isEmpty() ){
+            throw new BadRequestException("file is required");
+        }
+
+        /// before generating, check the user has not reached his limit
+        podcastLimitReached(podcastRequest);
+
+        User user = userRepository.findByEmail(podcastRequest.getEmail()).orElseThrow(()->
+                new UsernameNotFoundException("User not found"));
+
+        String key = UUID.randomUUID().toString();
+
+        Podcast podcast = Podcast.builder()
+                .podcastType(PodcastType.FILE)
+                .news(null)
+                .user(user)
+                .key(key)
+                .contentForm(podcastRequest.getContentForm())
+                .status(Status.PROCESSING)
+                .build();
+
+        podcastRepository.save(podcast);
 
 
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("file", file.getResource());
+        builder.part("filename", Objects.requireNonNull(file.getOriginalFilename()));
+        builder.part("form", podcastRequest.getContentForm());
+
+        /// we want to make an async call to our podcast api to generate the podcast and save to s3
+        client.post()
+                .uri("/api/v1/podcast/create/input")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .bodyValue(BodyInserters.fromMultipartData(builder.build()))
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), key, bytes));
 
 
+        /// return response to user to allow polling
+        return PodcastResponse
+                .builder()
+                .podcastId(podcast.getId())
+                .status(podcast.getStatus())
+                .build();
     }
 
 
-    @SneakyThrows
+
     public PodcastResponse generatePodcastFromInput(PodcastRequest podcastRequest) {
         /// ensure input is present
         if(podcastRequest.getPodcastType().equals(PodcastType.TEXT) && podcastRequest.getText() == null || podcastRequest.getText().isEmpty()){
-            throw new BadRequestException("text field can not be empty");
+            throw new BadRequestException("Podcast text cannot be empty");
         }
 
     }
