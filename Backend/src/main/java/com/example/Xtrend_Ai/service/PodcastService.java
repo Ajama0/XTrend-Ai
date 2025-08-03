@@ -75,12 +75,12 @@ public class PodcastService {
             User user  = userRepository.findByEmail(podcastRequest.getEmail()).orElseThrow(()->
                     new UsernameNotFoundException("User not found"));
 
-
             /// check for limit reached before generating
             PodcastLimitResponse limit= podcastLimitReached(podcastRequest);
             if(limit.getLimitReached().equals(Boolean.TRUE)) {
                 return PodcastResponse.builder().build();
             }
+
             String keyNumber = UUID.randomUUID().toString();
 
             Podcast podcast = Podcast.builder()
@@ -363,7 +363,11 @@ public class PodcastService {
     }
 
 
-
+    /**
+     *
+     * @param podcastRequest - request containing the input from the user
+     * @return podcastResponse used for polling
+     */
     public PodcastResponse generatePodcastFromInput(PodcastRequest podcastRequest) {
         /// ensure input is present
         boolean isTextEmpty = podcastRequest.getText() == null || podcastRequest.getText().isEmpty();
@@ -375,6 +379,17 @@ public class PodcastService {
 
         podcastLimitReached(podcastRequest);
 
+        /// ensure that the raw text input is more than 500 characters if content type is lone
+        /// podcast quality seems to be poor if the text input is small and content form is long
+        ContentForm contentForm;
+
+        if(!isTextEmpty && podcastRequest.getContentForm().equals(ContentForm.LONG ) && podcastRequest.getText().length()<500){
+            contentForm = ContentForm.SHORT;
+
+        }else{
+            contentForm = podcastRequest.getContentForm();
+        }
+
         User user = userRepository.findByEmail(podcastRequest.getEmail())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -385,11 +400,13 @@ public class PodcastService {
                 .news(null)
                 .user(user)
                 .key(key)
-                .contentForm(podcastRequest.getContentForm())
+                .contentForm(contentForm)
                 .status(Status.PROCESSING)
                 .build();
 
         podcastRepository.save(podcast);
+
+
 
         Map<String, Object> body = new HashMap<>();
         if (!isTextEmpty) {
@@ -397,7 +414,7 @@ public class PodcastService {
         } else {
             body.put("url", podcastRequest.getUrl());
         }
-        body.put("contentForm", podcastRequest.getContentForm().toString());
+        body.put("contentForm", contentForm.toString());
 
         client.post()
                 .uri("/api/v1/podcast/create/input")
