@@ -43,9 +43,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -368,12 +366,55 @@ public class PodcastService {
 
     public PodcastResponse generatePodcastFromInput(PodcastRequest podcastRequest) {
         /// ensure input is present
-        if(podcastRequest.getPodcastType().equals(PodcastType.TEXT) && podcastRequest.getText() == null || podcastRequest.getText().isEmpty()){
-            throw new BadRequestException("Podcast text cannot be empty");
-        }
-        return null;
+        boolean isTextEmpty = podcastRequest.getText() == null || podcastRequest.getText().isEmpty();
+        boolean isUrlEmpty = podcastRequest.getUrl() == null || podcastRequest.getUrl().isEmpty();
 
+        if (isTextEmpty && isUrlEmpty) {
+            throw new BadRequestException("Text or URL must be provided for podcast input");
+        }
+
+        podcastLimitReached(podcastRequest);
+
+        User user = userRepository.findByEmail(podcastRequest.getEmail())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        String key = UUID.randomUUID().toString();
+
+        Podcast podcast = Podcast.builder()
+                .podcastType(PodcastType.INPUT)
+                .news(null)
+                .user(user)
+                .key(key)
+                .contentForm(podcastRequest.getContentForm())
+                .status(Status.PROCESSING)
+                .build();
+
+        podcastRepository.save(podcast);
+
+        Map<String, Object> body = new HashMap<>();
+        if (!isTextEmpty) {
+            body.put("raw_text", podcastRequest.getText());
+        } else {
+            body.put("url", podcastRequest.getUrl());
+        }
+        body.put("contentForm", podcastRequest.getContentForm().toString());
+
+        client.post()
+                .uri("/api/v1/podcast/create/input")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(byte[].class)
+                .subscribe(bytes -> uploadPodcast(bucketName, podcast.getId(), key, bytes));
+
+        return PodcastResponse.builder()
+                .podcastId(podcast.getId())
+                .status(podcast.getStatus())
+                .build();
     }
 }
+
+
+
 
 
