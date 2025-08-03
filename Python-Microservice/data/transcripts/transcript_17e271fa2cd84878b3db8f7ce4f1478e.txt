@@ -1,0 +1,11 @@
+<Person1> "Welcome to Rela a i  - Your daily dose of trending news. Buckle up, because today we're hitting the road – virtually, of course – to jolly old England!  We're talking driving licenses, car rentals, and maybe even shipping your own car across the pond!"
+</Person1><Person2>  " Hold on! Are we really saying Americans can just… drive in England? With the steering wheel on the other side?!"
+</Person2><Person1> "  That's right! With a valid US driver's license, you're good to go for a whole year after arriving.  Think of it: cruising through the Cotswolds… picturing sheep… dodging roundabouts…"
+</Person1><Person2>  "  Okay, slow down, speed racer!  What about rentals? Do they just hand you the keys and say, 'Off you go, mate'?" 
+</Person2><Person1> "Almost! Your license can't be expired, obviously. And if it's not in English, you'll need an international driving permit. Plus, passport, return ticket, proof of address – the usual suspects. But a British sports car? Totally doable!"
+</Person1><Person2> " A sports car?  I'd be too nervous about scraping it on those narrow English lanes!  Now, this shipping-your-own-car business...  Is that really a thing?" 
+</Person2><Person1> " Apparently so!  Six months of driving your own car in England, no registration, no taxing, keep your US plates.  Just imagine: your own comfy ride on the left… er, right side of the road!" 
+</Person1><Person2> " Wait, left?  Right?!  I'm getting confused just thinking about it!" 
+</Person2><Person1> "  Don't worry!  Just remember to have proof you're a visitor if the police stop you – like that plane ticket, that would help. Oh! and make sure your car insurance covers you across the pond. Give your insurer a call before you go and avoid costly bills if the worst was to happen!" 
+</Person1><Person2> " So much to think about! It sounds exciting though… the open road… fish and chips by the seaside… definitely something to consider. "
+</Person2><Person1> "It definitely is! Thanks for joining us on Rela a i today, folks! Safe travels, whether you're headed to England or just dreaming about it. See you in the next episode!" </Person1>

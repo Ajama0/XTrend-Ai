@@ -1,0 +1,13 @@
+<Person1> "Welcome to Rela A-I - Your daily dose of trending news.  Have you heard about this Kate Bush Day thing?  It's absolutely bonkers!" 
+</Person1><Person2> "Kate Bush Day?  Is that like, a national holiday now?   Seriously though, what's the deal?" 
+</Person2><Person1> "It's this amazing, slightly insane tribute to Kate Bush’s ‘Wuthering Heights.’  Hundreds, sometimes thousands, of people dress up in red dresses and recreate the music video.  It's pure, unadulterated joy!"
+</Person1><Person2> "Hold on, red dresses?  Mass choreography? This sounds…intense.  Where does this even happen?"
+</Person2><Person1> "It started in Brighton, but it's spread all over the world! From Folkestone to Finland, people are channeling their inner Kate. They even have 'head Kates' leading the dance!" 
+</Person1><Person2> "Head Kates?  Okay, you've officially sold me.  This sounds like something out of a fever dream." 
+</Person2><Person1> " Right? The article talks about this one woman, Helen, who became a 'head Kate'. She describes it as 'one of the most lovely, heart-warming and life-affirming days of her life.'" 
+</Person1><Person2> "I can kind of see that.  It's so weird, it's almost…spiritual?  A collective experience, like the article said." 
+</Person2><Person1> "Exactly! It's about coming together, doing something silly, and just feeling connected.  The organizer said it best: 'Everybody’s doing something for no other reason than that they want to do something fun together.'"
+</Person1><Person2> "That's actually really beautiful. Maybe we should go next year.  I'd rock a red dress.    Although, I’m not sure I’ve got the moves." 
+</Person2><Person1> "Me neither, but that's the point!  No judgment, just pure Kate Bush appreciation.  I'm sold! It’s me, I’m Cathy! "
+</Person1><Person2> "  Oh dear God. This is going to be interesting. Anyway, thanks for sharing this wonderfully bizarre news, that was a good one!" 
+</Person2><Person1> "Always a pleasure!  Thanks for listening, and we'll catch you next time on Rela A-I!" </Person1>

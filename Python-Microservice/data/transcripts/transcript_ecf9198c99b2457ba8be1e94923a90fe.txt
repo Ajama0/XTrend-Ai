@@ -1,0 +1,11 @@
+<Person1> "Welcome to Rela A-I - Your daily dose of trending news.  Forty-six years young and still throwing punches!  Manny Pacquiao, back in the ring against Mario Barrios… and the judges… well, let’s just say they saw things a little differently." 
+</Person1><Person2> "Differently is an understatement! I mean, a draw?  Come on!  This was a championship fight, not a friendly sparring session.  Someone’s gotta win, right?" 
+</Person2><Person1> "Right you are! And Pacquiao thought he won. Quote: ‘I thought I won the fight. It was a close fight. He was very tough.’    Classic Pacquiao humility, even when he’s probably right." 
+</Person1><Person2> "But those Compubox numbers…  Barrios landed more punches, threw more punches…  It's right there in black and white, 120 landed for Barrios, 101 for Pacquiao.  That’s… a lot of punches either way!"
+</Person2><Person1> "It is! A veritable flurry of fists!  But remember, boxing isn't just about how many you land, it's about how you land them.  Pacquiao’s always been about speed and precision, not brute force." 
+</Person1><Person2> "I guess so.  But still… even Barrios said he’d be up for a rematch. ‘This was huge for boxing. I’d love to do it again.’  Sounds like even he knows something wasn’t quite right." 
+</Person2><Person1> "A rematch would be huge! The fans would go crazy!  And Pacquiao said he just needs a longer training camp.  Blaming the election for a late start… that’s a new one." 
+</Person1><Person2> "Only Pacquiao could pull that off.  Politician, boxer, singer… is there anything this guy can’t do?"
+</Person2><Person1> "Apparently, convincingly win a draw. But hey, at least he wants to leave a legacy and make the Filipino people proud. And that’s a quote!"
+</Person1><Person2> "Respect.  But a rematch needs to happen.  For the sake of the sport, for the sake of the fans… for the sake of knowing who actually won!"
+</Person2><Person1> "Agreed.  And on that note, folks, we wrap up another episode of Rela A-I!  Until next time, stay informed, stay entertained, and stay tuned!"</Person1>

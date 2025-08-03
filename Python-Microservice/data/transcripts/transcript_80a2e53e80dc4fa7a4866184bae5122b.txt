@@ -1,0 +1,11 @@
+<Person1> "Welcome to Rela A-I - Your daily dose of trending news.  Buckle up, buttercup, because today we're diving into some seriously juicy NBA trade rumors!  Giannis… to the Hawks?! What in the basketball world?!"
+</Person1><Person2> "Hold up, hold up, are we talking about the Greek Freak himself? Leaving Milwaukee? I thought they were like, superglued together." 
+</Person2><Person1> "Apparently not! Bleacher Report's Connor Thoms dropped this bombshell – a potential trade that sends Giannis to Atlanta! In return, the Bucks get the number one pick from the 2024 draft, Zaccharie Risacher, and Jalen Johnson. Plus, a whole heap of future picks!"
+</Person1><Person2> "Zaccharie Risacher... Jalen Johnson…  Okay, but that doesn't sound like an equal trade for a two-time MVP, a Defensive Player of the Year, and a Finals MVP.  I mean, Giannis is a walking highlight reel!"
+</Person2><Person1> "Well, Thoms argues that it's a win-win. He thinks Jalen Johnson could become a legitimate all-star like, tomorrow.  Plus, all those draft picks give the Bucks a solid foundation for the future." 
+</Person1><Person2> "I see, interesting.  But let's be real, trading Giannis would be like the Bucks trading away their own soul. They waived and stretched Damian Lillard just to free up space for him. They are desperate to keep him." 
+</Person2><Person1> "Exactly!  That's Thoms’ point. If Giannis demands a trade, Milwaukee's hands are tied. They'd have to get something in return, right?" 
+</Person1><Person2> "Yeah, but "something" and Giannis Antetokounmpo are two very different somethings.  Trading him away would be like…  like trading away sunshine for a cloudy day with a chance of meatballs." 
+</Person2><Person1> "Got it.  Okay,  I'm getting whiplash from all these hypothetical trades. This one sounds kinda bonkers, but it's definitely got people talking! Imagine Giannis throwing lobs to Trae Young! The Eastern Conference would be absolutely electrified!" 
+</Person1><Person2> "Electrified with confusion, maybe. Seriously though, this is pure speculation, folks. But hey,  it's the NBA offseason, baby! Where rumors run wild and logic takes a vacation!  " 
+</Person2><Person1> "True that!  Thanks for tuning in to Rela A-I, folks! We'll be back tomorrow with more mind-blowing sports news. Until then,  stay tuned!"</Person1>

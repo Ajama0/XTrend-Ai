@@ -1,0 +1,13 @@
+<Person1> "Welcome to Rela A-I - Your daily dose of trending news!  It's Man U versus Bournemouth in the Premier League Summer Series, folks! Can you believe it?!"
+</Person1><Person2> "Bournemouth unbeaten in four competitive meetings against the Red Devils?  Pull the other one!  Although, that late Højlund equalizer in April...ouch, that was close!"
+</Person2><Person1> "Right?! This preview from Sports Illustrated has me on the edge of my seat! Chicago's Soldier Field is the battleground.  Wednesday night, people! Or, uh, Thursday morning, depending on your time zone. "
+</Person1><Person2> "Always with the time zones!  It's like a global football party! So, what's the deal with these lineups? Any big surprises?"
+</Person2><Person1> "Well,  Mbeumo is out for Man U.  Still, Fernandes scored twice against West Ham.  Double trouble! And Bournemouth?  They're rocking a new-look defense. Petrović and Truffert started against Everton…held up pretty well, I hear." 
+</Person1><Person2> "Petrović, Truffert… new kids on the block trying to shut down the Red Devils?  That's a tall order!"
+</Person2><Person1> "Don't count them out! And get this – Zabarnyi is still with the squad despite PSG sniffing around…juicy transfer gossip!"
+</Person1><Person2> "Ooh la la!   Transfer drama! Gotta love it. So, predictions? Crystal ball time!"
+</Person2><Person1> "Sports Illustrated is going bold – Man U 1, Bournemouth 2. They're saying Bournemouth's slick cohesion could be the key." 
+</Person1><Person2> "Whoa!  Upset alert! I gotta say, I'm...intrigued.  Man U losing to Bournemouth?  That would be…  well, let's just say the headlines would write themselves." 
+</Person2><Person1> "Exactly! I'm excited to see how this one plays out. And speaking of plays, did you see that quote? "United’s loss of second-half control against West Ham could’ve been attributed to the switch in personnel, but teams are still finding it far too easy to retain possession..."  Ouch!"
+</Person1><Person2> "Burn!  Someone's throwing shade! Anyway, gotta run! Catch you later, folks!"
+</Person2><Person1> "And that's a wrap! Thanks for tuning in to Rela A-I, folks! Until next time, stay tuned for more trending news!"</Person1>
