@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit{
     { title: 'Podcast from Text', description: 'Convert any text into a podcast.' },
     { title: 'Podcast from PDFs', description: 'Upload PDFs and get instant podcasts.' },
     { title: 'Podcast from Transcripts', description: 'Transform lengthy transcripts into podcasts.' },
-     { title: 'Podcast from Youtube Urls', description: 'Turn any youtube video into a podcast with just a url.' }
+     { title: 'Podcast from Urls', description: 'Turn any url into a podcast by passing in just a url to the input.' }
   ];
 
   currentPodcast: any = null;

@@ -1,0 +1,155 @@
+/* Animated Title */
+.animated-title {
+  animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+  0% {
+    filter: drop-shadow(0 0 20px rgba(79, 70, 229, 0.3));
+    transform: translateY(0px);
+  }
+  100% {
+    filter: drop-shadow(0 0 30px rgba(147, 51, 234, 0.4));
+    transform: translateY(-2px);
+  }
+}
+
+/* Fade in animation */
+.animate-fade-in {
+  animation: fadeIn 1s ease-in-out;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Content Type Buttons */
+.content-type-btn {
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.content-type-btn:hover {
+  transform: translateY(-2px);
+}
+
+/* Scale hover effect */
+.hover\:scale-102:hover {
+  transform: scale(1.02);
+}
+
+/* Input Container Animations */
+.input-container {
+  animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Upload Area */
+.upload-area {
+  position: relative;
+  cursor: pointer;
+}
+
+.upload-area:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Style Buttons */
+.style-btn {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(10px);
+}
+
+.style-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Create Button */
+.create-btn {
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3);
+}
+
+.create-btn:hover {
+  box-shadow: 0 6px 25px rgba(79, 70, 229, 0.4);
+}
+
+/* Pulse animation for active states */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Loading state (can be used later) */
+.loading {
+  animation: pulse 2s infinite;
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .animated-title {
+    font-size: 3rem;
+  }
+  
+  .content-type-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .style-btn {
+    padding: 1rem;
+  }
+}
+
+/* Gradient border animation for selected states */
+.border-gradient {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(45deg, #6366f1, #8b5cf6) border-box;
+  border: 2px solid transparent;
+}
+
+/* Custom scrollbar for textarea */
+textarea::-webkit-scrollbar {
+  width: 6px;
+}
+
+textarea::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+textarea::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

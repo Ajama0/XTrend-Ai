@@ -3,9 +3,9 @@ import { LoginComponent } from './login/login.component';
 import { HomeComponent } from './home/home.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { NewsComponent } from './news/news.component';
-import { VideogenComponent } from './videogen/videogen.component';
 import { PodcastComponent } from './podcast/podcast.component';
 import { BlogComponent } from './blog/blog.component';
+import { TempComponent } from './temp/temp.component';
 
 export const routes: Routes = [
 
@@ -29,17 +29,16 @@ export const routes: Routes = [
         path :'news',
         component : NewsComponent
     },
-    
-        { path: 'generate-video/:id', 
-        component: VideogenComponent },
-
-        {
+    {
             path: 'podcast-player/:id',
             component:PodcastComponent
         },
         {
             path: 'generate-blog/:id',
             component:BlogComponent
+        },{
+            path: 'temp/audio',
+            component: TempComponent
         }
 
         
