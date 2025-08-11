@@ -56,7 +56,7 @@ public class PodcastController {
             @RequestPart(name="podcastInfo") PodcastRequest podcastRequest,
             @RequestPart(name="file") MultipartFile file) throws IOException {
 
-        PodcastResponse response = podcastService.generatePodcastFromPdfOrImage(podcastRequest, file);
+        PodcastResponse response = podcastService.generatePodcastFromPdf(podcastRequest, file);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
 
     }

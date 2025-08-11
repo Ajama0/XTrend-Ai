@@ -280,12 +280,12 @@ public class PodcastService {
      * @param podcastRequest - DTO that contains type, contentform and user
      * @return - podcast id and status used for polling.
      */
-    public PodcastResponse generatePodcastFromPdfOrImage(PodcastRequest podcastRequest, MultipartFile file) throws IOException {
+    public PodcastResponse generatePodcastFromPdf(PodcastRequest podcastRequest, MultipartFile file) throws IOException {
         if(podcastRequest.getPodcastType().equals(PodcastType.FILE) && (file ==null || file.isEmpty() )){
             throw new BadRequestException("file is required");
         }
 
-        String filename = getFilename(podcastRequest, file);
+        String filename = getFilename(file);
         byte[] fileBytes = file.getBytes();
 
         /// before generating, check the user has not reached his limit
@@ -340,22 +340,10 @@ public class PodcastService {
 
 
 
-    private String getFilename(PodcastRequest podcastRequest, MultipartFile file) {
+    private String getFilename( MultipartFile file) {
         String filename = Objects.requireNonNull(file.getOriginalFilename());
 
-        if (
-                (file.getOriginalFilename().endsWith(".jpg") ||
-                        file.getOriginalFilename().endsWith(".jpeg") ||
-                        file.getOriginalFilename().endsWith(".png")) &&
-                        podcastRequest.getContentForm().equals(ContentForm.LONG)
-        ) {
-            throw new BadRequestException("images can only be short form");
-        }
-
-
-
-        if(!filename.endsWith(".pdf") && !filename.endsWith("jpg") && !filename.endsWith(".png")
-            && !filename.endsWith(".jpeg")){
+        if(!filename.endsWith(".pdf")){
             throw new BadRequestException("files can not be in this format" + filename.substring(filename.indexOf(".")));
 
         }

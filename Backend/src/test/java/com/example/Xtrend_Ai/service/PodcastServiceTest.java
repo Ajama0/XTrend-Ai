@@ -9,7 +9,9 @@ import com.example.Xtrend_Ai.entity.News;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.entity.User;
 import com.example.Xtrend_Ai.enums.ContentForm;
+import com.example.Xtrend_Ai.enums.PodcastType;
 import com.example.Xtrend_Ai.enums.Status;
+import com.example.Xtrend_Ai.exceptions.BadRequestException;
 import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
@@ -28,6 +30,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.Disposable;
 import reactor.core.publisher.Mono;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
@@ -89,7 +92,7 @@ class PodcastServiceTest {
         when(limitResponse.getLimitReached()).thenReturn(true);
 
         //when
-        PodcastResponse podcastResponse = underTest.generatePodcast(podcastRequest);
+        PodcastResponse podcastResponse = underTest.generatePodcastFromNews(podcastRequest);
 
         //then
         verify(podcastRepository, times(0)).save(any(Podcast.class));
@@ -138,7 +141,7 @@ class PodcastServiceTest {
 
 
         //when
-        underTest.generatePodcast(podcastRequest);
+        underTest.generatePodcastFromNews(podcastRequest);
         ArgumentCaptor<Podcast> podcastCaptor = ArgumentCaptor.forClass(Podcast.class);
 
         //then
@@ -260,6 +263,64 @@ class PodcastServiceTest {
         assertThrows(IllegalArgumentException.class, () -> underTest.deletePodcast(1L));
 
         verify(s3Service,times(0)).DeleteObject(anyString(),anyString());
+
+    }
+
+    @Test
+    void GeneratePodcastFromInputWhenInputIsNotValid() {
+        //given
+        PodcastRequest podcastRequest = mock(PodcastRequest.class);
+        when(podcastRequest.getText().isEmpty()).thenReturn(true);
+        when(podcastRequest.getUrl().isEmpty()).thenReturn(true);
+
+        //assert/when
+        assertThrows(BadRequestException.class, ()-> underTest.generatePodcastFromInput(any(PodcastRequest.class)));
+
+        verify(underTest.podcastLimitReached(any(PodcastRequest.class)), times(0));
+    }
+
+    @Test
+    void GeneratePodcastFromInputWhenInputIsValid() {
+
+        //given
+        PodcastRequest podcastRequest = mock(PodcastRequest.class);
+        UserRepository userRepository = mock(UserRepository.class);
+        PodcastRepository podcastRepository = mock(PodcastRepository.class);
+        WebClient webClient = mock(WebClient.class);
+
+        PodcastRequest request = new PodcastRequest();
+        request.setContentForm(ContentForm.LONG);
+        request.setPodcastType(PodcastType.INPUT);
+        request.setText("something example");
+
+
+
+        when(podcastRequest.getText().isEmpty()).thenReturn(false);
+        when(podcastRequest.getText()).thenReturn(any(String.class));
+        when(podcastRequest.getUrl().isEmpty()).thenReturn(false);
+        when(podcastRequest.getUrl()).thenReturn(any(String.class));
+        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(any(User.class)));
+
+
+        doNothing().when(underTest).podcastLimitReached(any(PodcastRequest.class));
+
+        //when
+         PodcastResponse podcastResponse = underTest.generatePodcastFromInput(request);
+
+        ArgumentCaptor<Podcast> podcast= ArgumentCaptor.forClass(Podcast.class);
+
+        verify(podcastRepository).save(podcast.capture());
+        verify(webClient, times(1)).post();
+
+        Podcast saved = podcast.getValue();
+        assertEquals(PodcastType.INPUT, saved.getPodcastType());
+        //because the input is less than 500 characters
+        assertEquals(ContentForm.SHORT, saved.getContentForm());
+        assertEquals(Status.PROCESSING, podcastResponse.getStatus());
+        assertNotNull(podcastResponse.getPodcastId());
+
+
+
 
     }
 }

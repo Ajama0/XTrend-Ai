@@ -29,5 +29,5 @@ public class PodcastRequest {
     //the frontend will pass in one of these inputs based on what user selects, and the others not used will be ignored
     private Long newsId;
     private String text;
-    private String url;
+    private String url; //any url including image urls
 }

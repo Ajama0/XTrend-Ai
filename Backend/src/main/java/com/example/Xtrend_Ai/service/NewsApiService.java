@@ -149,7 +149,7 @@ public class NewsApiService {
      * @return a list of news objects
      */
     public NewsDTO findAllNews() {
-        List<News> newsList = newsRepository.findAll();
+        List<News> newsList = newsRepository.findAllArticlesByDate();
         if (newsList.isEmpty()) {
             throw new ArticleNotFoundException("no Articles were found");
         }
