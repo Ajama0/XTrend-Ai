@@ -14,10 +14,18 @@ export class PodcastService {
   constructor(private http:HttpClient) { }
 
 
-  createPodcast(podcastRequest:PodcastRequest):Observable<PodcastResponse>{
+  createPodcastFromNews(podcastRequest:PodcastRequest):Observable<PodcastResponse>{
     // This method will call the backend to create a podcast
     // and return an observable of PodcastResponse
-    return this.http.post<PodcastResponse>(`${this.api_base}/podcast/generate`, podcastRequest);
+    return this.http.post<PodcastResponse>(`${this.api_base}/podcast/create/from/news`, podcastRequest);
+  }
+
+  createPodcastFromPdf(podcastRequest:FormData):Observable<PodcastResponse>{
+    return this.http.post<PodcastResponse>(`${this.api_base}/podcast/create/from/file`, podcastRequest);
+  }
+
+  createPodcastFromInput(podcastRequest:PodcastRequest):Observable<PodcastResponse>{
+    return this.http.post<PodcastResponse>(`${this.api_base}/podcast/create/from/input`, podcastRequest);
   }
 
     /**
@@ -28,11 +36,18 @@ export class PodcastService {
       return this.http.get<PodcastResponse>(`${this.api_base}/podcast/status/${id}`);
     }
     
+    /**
+     * 
+     * @param id - this represents the podcast id
+     * @returns  - returns the presigned url for the podcast
+     */
     getPresignedUrl(id: string): Observable<PodcastResponse> {
       const endpoint = `${this.api_base}/podcast/download/${id}`;
       console.log(endpoint)
       return this.http.get<PodcastResponse>(endpoint);
   }
+
+
 
   }
 

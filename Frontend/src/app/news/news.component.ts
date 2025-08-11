@@ -46,17 +46,13 @@ onCardClick() {
 }
 
   handleAction(type: string) {
-    if(type == "video"){
-      this.router.navigate(['/generate-video', 14]); // hardcoded ID for demonstration, replace with actual ID as needed
-    }else if(type == "blog"){
-      this.router.navigate(['/generate-blog', 14]); // hardcoded ID for demonstration, replace with actual ID as needed   
-    }
-    else{
-      this.generatePodcast()
-    
-  }
+    if(type == "podcast"){
+      //function called here
+      this.generateFromNews()
 
   }
+
+}
 
 
   handleClose() {
@@ -103,7 +99,7 @@ onCardClick() {
 
 
 
-  generatePodcast():void{
+  generateFromNews():void{
     //**
     // we call podcast service to generate a podcast
     // we return a podcast response which contains the information for polling
@@ -113,11 +109,12 @@ onCardClick() {
     const podcastRequest :PodcastRequest = 
     {
       newsId : this.newsId,
-      email :"harry@example.com",
-      contentForm: "SHORT"
+      email :"harry@example.com", //TODO: get the email from the user
+      contentForm: "SHORT",
+      podcastType: "NEWS"
     }
   
-    this.podcast$ = this.podcastService.createPodcast(podcastRequest);
+    this.podcast$ = this.podcastService.createPodcastFromNews(podcastRequest);
 
     this.podcast$.subscribe({
       next:(response:PodcastResponse)=>{
@@ -171,5 +168,7 @@ onCardClick() {
 
   
 }
+
+
 
 
