@@ -57,6 +57,7 @@ public class PodcastService {
     private final UserRepository userRepository;
     private final S3Service s3Service;
     private final MailService mailService;
+    private final TextExtractionService textExtractionService;
 
 
     @Value("${bucket.name}")
@@ -167,6 +168,8 @@ public class PodcastService {
             mailService.sendMail("abasjama06@gmail.com", bodyFormat, "Your podcast is finally ready!");
             log.info("email sent");
 
+
+            log.info("podcast status is completed the frontend will status completed");
             return PodcastResponse.builder()
                     .status(podcast.getStatus())
                     .podcastId(podcast.getId())
@@ -285,6 +288,8 @@ public class PodcastService {
             throw new BadRequestException("file is required");
         }
 
+        log.info("podcast request in functionnnnn ");
+
         String filename = getFilename(file);
         byte[] fileBytes = file.getBytes();
 
@@ -392,17 +397,23 @@ public class PodcastService {
                 .status(Status.PROCESSING)
                 .build();
 
-        podcastRepository.save(podcast);
+
 
 
 
         Map<String, Object> body = new HashMap<>();
         if (!isTextEmpty) {
+            /// setting the title of the podcast when text
+            podcast.setPodcastTitle(textExtractionService.ExtractTextForTitle(podcastRequest.getText()));
             body.put("raw_text", podcastRequest.getText());
         } else {
+            /// setting the title for podcast when url
+            podcast.setPodcastTitle(textExtractionService.extractTitleOrDomain(podcastRequest.getUrl()));
             body.put("url", podcastRequest.getUrl());
         }
         body.put("contentForm", contentForm.toString());
+
+        podcastRepository.save(podcast);
 
         client.post()
                 .uri("/api/v1/podcast/create/input")

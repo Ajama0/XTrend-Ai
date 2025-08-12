@@ -148,6 +148,7 @@ public class NewsApiService {
      *
      * @return a list of news objects
      */
+    @Transactional
     public NewsDTO findAllNews() {
         List<News> newsList = newsRepository.findAllArticlesByDate();
         if (newsList.isEmpty()) {

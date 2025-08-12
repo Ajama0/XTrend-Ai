@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface NewsRepository extends JpaRepository<News, Long> {
 
-    @Query("SELECT * FROM NEWS n order by n.pubDate")
+    @Query("SELECT n FROM News n order by n.article.pubDate")
     List<News> findAllArticlesByDate();
 }

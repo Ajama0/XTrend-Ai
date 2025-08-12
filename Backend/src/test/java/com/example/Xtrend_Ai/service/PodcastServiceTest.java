@@ -269,40 +269,41 @@ class PodcastServiceTest {
     @Test
     void GeneratePodcastFromInputWhenInputIsNotValid() {
         //given
-        PodcastRequest podcastRequest = mock(PodcastRequest.class);
-        when(podcastRequest.getText().isEmpty()).thenReturn(true);
-        when(podcastRequest.getUrl().isEmpty()).thenReturn(true);
+        PodcastRequest podcastRequest = new PodcastRequest();
+        podcastRequest.setText("");
+        podcastRequest.setUrl("");
 
         //assert/when
-        assertThrows(BadRequestException.class, ()-> underTest.generatePodcastFromInput(any(PodcastRequest.class)));
+        assertThrows(BadRequestException.class, ()-> underTest.generatePodcastFromInput(podcastRequest));
 
-        verify(underTest.podcastLimitReached(any(PodcastRequest.class)), times(0));
+
     }
 
+    //TODO go over this test
     @Test
     void GeneratePodcastFromInputWhenInputIsValid() {
 
         //given
-        PodcastRequest podcastRequest = mock(PodcastRequest.class);
-        UserRepository userRepository = mock(UserRepository.class);
-        PodcastRepository podcastRepository = mock(PodcastRepository.class);
-        WebClient webClient = mock(WebClient.class);
+        PodcastLimitResponse limitResponse = mock(PodcastLimitResponse.class);
+        User user = mock(User.class);
 
         PodcastRequest request = new PodcastRequest();
         request.setContentForm(ContentForm.LONG);
         request.setPodcastType(PodcastType.INPUT);
         request.setText("something example");
+        request.setEmail("harry@example.com");
+
+        WebClient.RequestBodyUriSpec requestBodyUriSpec = mock(WebClient.RequestBodyUriSpec.class);
+        WebClient.RequestHeadersSpec requestHeadersSpec = mock(WebClient.RequestHeadersSpec.class);
+        WebClient.ResponseSpec responseSpec = mock(WebClient.ResponseSpec.class);
+        Mono<byte[]> mockMono = mock(Mono.class);
 
 
 
-        when(podcastRequest.getText().isEmpty()).thenReturn(false);
-        when(podcastRequest.getText()).thenReturn(any(String.class));
-        when(podcastRequest.getUrl().isEmpty()).thenReturn(false);
-        when(podcastRequest.getUrl()).thenReturn(any(String.class));
-        when(userRepository.findByEmail(any(String.class))).thenReturn(Optional.ofNullable(any(User.class)));
+        when(userRepository.findByEmail("harry@example.com")).thenReturn(Optional.of(user));
 
 
-        doNothing().when(underTest).podcastLimitReached(any(PodcastRequest.class));
+        doReturn(limitResponse).when(underTest).podcastLimitReached(any(PodcastRequest.class));
 
         //when
          PodcastResponse podcastResponse = underTest.generatePodcastFromInput(request);

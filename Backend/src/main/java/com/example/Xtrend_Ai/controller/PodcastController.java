@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
 
 @RestController
 @RequestMapping("api/v1/podcast")
@@ -67,4 +68,8 @@ public class PodcastController {
         PodcastResponse podcastResponse = podcastService.generatePodcastFromInput(podcastRequest);
         return new ResponseEntity<>(podcastResponse, HttpStatus.CREATED);
     }
+
+
+    @GetMapping(path="/me")
+    public ResponseEntity<List<URL
 }

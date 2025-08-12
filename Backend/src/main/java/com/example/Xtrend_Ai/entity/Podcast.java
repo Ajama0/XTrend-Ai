@@ -4,10 +4,7 @@ import com.example.Xtrend_Ai.enums.ContentForm;
 import com.example.Xtrend_Ai.enums.PodcastType;
 import com.example.Xtrend_Ai.enums.Status;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -49,4 +46,7 @@ public class Podcast {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PodcastType podcastType;
+
+    @NonNull
+    private String podcastTitle;
 }
