@@ -15,7 +15,7 @@ import { PodcastRequest } from '../models/PodcastRequest';
 @Component({
   selector: 'app-news',
   imports: [CommonModule],
-  templateUrl: './news.component.html',
+  template: `<!-- News component now serves as data provider only -->`,
   styleUrl: './news.component.css'
 })
 export class NewsComponent implements OnInit{
@@ -139,7 +139,6 @@ onCardClick() {
    * @param podcastResponse  - referes ti the response from the backend
    */
   pollPodcastStatus(podcastResponse: PodcastResponse): void {
-
     console.log("Polling for podcast status with ID:", podcastResponse.podcastId);
     const intervalId = setInterval(() => {
       this.podcastService.getPodcastStatus(podcastResponse.podcastId).subscribe({
@@ -149,10 +148,13 @@ onCardClick() {
             console.log("Final podcast status:", response.status);
             clearInterval(intervalId);
             if(response.status === 'COMPLETED'){
-              this.router.navigate(['/podcast-player', response.podcastId]); // Navigate to the podcast page
+              // Instead of automatically navigating, show notification
+              if (confirm('Your podcast is ready! Would you like to check it out in My Podcasts?')) {
+                this.router.navigate(['/my-podcasts']);
+              }
             }else if(response.status === 'FAILED'){
               console.error("Podcast generation failed.");
-              //handle failure case and see why. e.g., show an error message to the user
+              alert('Podcast generation failed. Please try again.');
             }
           }
         },
@@ -161,8 +163,7 @@ onCardClick() {
           clearInterval(intervalId); // Stop polling on error
         }
       });
-    }, 20000); // Poll every 15 seconds, for long form content make it more. 
-   
+    }, 3000); // Poll every 3 seconds (faster polling)
   }
 
 

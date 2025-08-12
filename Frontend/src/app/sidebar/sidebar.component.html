@@ -1,0 +1,98 @@
+<!-- Sidebar Component -->
+<div class="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 shadow-lg z-50 flex flex-col">
+  <!-- Logo Section -->
+  <div class="p-6 border-b border-gray-100">
+    <h1 class="text-2xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+      Rela AI
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">AI-powered content studio</p>
+  </div>
+
+  <!-- Navigation Items -->
+  <nav class="flex-1 px-4 py-6">
+    <ul class="space-y-2">
+      <!-- Home -->
+      <li>
+        <a 
+          routerLink="/" 
+          routerLinkActive="bg-indigo-50 text-indigo-700 border-indigo-200"
+          class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-all cursor-pointer border border-transparent"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+          </svg>
+          <span class="font-medium">Home</span>
+        </a>
+      </li>
+
+      <!-- Explore -->
+      <li>
+        <a 
+          routerLink="/explore" 
+          routerLinkActive="bg-indigo-50 text-indigo-700 border-indigo-200"
+          class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-all cursor-pointer border border-transparent"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 6.65a7.5 7.5 0 010 10.6z"/>
+          </svg>
+          <span class="font-medium">Explore News</span>
+        </a>
+      </li>
+
+      <!-- My Podcasts -->
+      <li>
+        <a 
+          routerLink="/my-podcasts" 
+          routerLinkActive="bg-indigo-50 text-indigo-700 border-indigo-200"
+          class="flex items-center gap-3 px-4 py-3 text-gray-700 rounded-lg hover:bg-gray-50 transition-all cursor-pointer border border-transparent"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+          </svg>
+          <span class="font-medium">My Podcasts</span>
+          <span *ngIf="podcastCount > 0" class="ml-auto bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full">
+            {{podcastCount}}
+          </span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Divider -->
+    <div class="my-6 border-t border-gray-100"></div>
+
+    <!-- Quick Create Section -->
+    <div class="space-y-3">
+      <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Quick Create</p>
+      
+      <button class="w-full flex items-center gap-3 px-4 py-3 text-left text-gray-700 rounded-lg hover:bg-blue-50 hover:text-blue-700 transition-all cursor-pointer">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        <span class="text-sm font-medium">New Podcast</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- User Profile Section -->
+  <div class="p-4 border-t border-gray-100">
+    <div class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 cursor-pointer">
+      <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+        U
+      </div>
+      <div class="flex-1">
+        <p class="text-sm font-medium text-gray-900">User</p>
+        <p class="text-xs text-gray-500">Free Plan</p>
+      </div>
+      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- Main content overlay for mobile -->
+<div 
+  *ngIf="isMobileMenuOpen" 
+  class="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+  (click)="toggleMobileMenu()"
+></div>

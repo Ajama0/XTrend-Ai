@@ -1,0 +1,121 @@
+<!-- Trending News Cards - Swipeable Section -->
+<div class="w-full py-12 bg-gradient-to-br from-gray-50 to-blue-50">
+  <div class="max-w-6xl mx-auto px-4">
+    <!-- Header -->
+    <div class="text-center mb-8">
+      <h2 class="text-3xl font-bold text-gray-900 mb-2">Trending Today</h2>
+      <p class="text-gray-600">Swipe through the latest trending news and create podcasts instantly</p>
+    </div>
+
+    <!-- Swipeable Cards Container -->
+    <div class="relative">
+      <!-- Navigation Arrows -->
+      <button 
+        (click)="previousCard()" 
+        [disabled]="currentIndex === 0"
+        class="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <button 
+        (click)="nextCard()" 
+        [disabled]="currentIndex >= trendingArticles.length - 1"
+        class="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center text-gray-600 hover:text-indigo-600 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+
+      <!-- Cards Container -->
+      <div class="overflow-hidden mx-16">
+        <div 
+          class="flex transition-transform duration-500 ease-in-out"
+          [style.transform]="'translateX(-' + (currentIndex * 100) + '%)'"
+        >
+          <!-- Individual Cards -->
+          <div 
+            *ngFor="let article of trendingArticles; let i = index" 
+            class="w-full flex-shrink-0 px-4"
+          >
+            <div class="relative max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300">
+              <!-- Background Image -->
+              <div class="relative h-80">
+                <img 
+                  [src]="article.image_url || '/assets/default-news.jpg'" 
+                  [alt]="article.title"
+                  class="w-full h-full object-cover"
+                />
+                <!-- Gradient Overlay -->
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                
+                <!-- Content Overlay -->
+                <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
+                  <h3 class="text-xl font-bold mb-2 line-clamp-2">{{ article.title }}</h3>
+                  <p class="text-gray-200 text-sm mb-4 line-clamp-3">{{ article.description }}</p>
+                  
+                  <!-- Action Buttons -->
+                  <div class="flex gap-3">
+                    <button 
+                      (click)="generatePodcast(article)"
+                      [disabled]="isCreatingPodcast"
+                      class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 text-white px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105"
+                    >
+                      <svg *ngIf="generatingPodcast !== article.newsId" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+                      </svg>
+                      <div *ngIf="generatingPodcast === article.newsId" class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>{{ generatingPodcast === article.newsId ? 'Creating...' : 'Podcast' }}</span>
+                    </button>
+                    
+                    <button 
+                      (click)="openArticle(article)"
+                      class="flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-medium transition-all backdrop-blur-sm"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                      </svg>
+                      <span>Read</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Category Badge -->
+                <div class="absolute top-4 left-4">
+                  <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-xs font-medium">
+                    {{ article.category || 'News' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dots Indicator -->
+      <div class="flex justify-center mt-6 gap-2">
+        <button 
+          *ngFor="let article of trendingArticles; let i = index"
+          (click)="goToCard(i)"
+          [class]="'w-3 h-3 rounded-full transition-all ' + (i === currentIndex ? 'bg-indigo-600' : 'bg-gray-300')"
+        ></button>
+      </div>
+    </div>
+
+    <!-- View All Button -->
+    <div class="text-center mt-8">
+      <button 
+        routerLink="/explore"
+        class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+      >
+        Explore All News
+        <svg class="inline-block w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>

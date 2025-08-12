@@ -1,13 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NavbarComponent } from '../navbar/navbar.component';
+import { SidebarComponent } from '../sidebar/sidebar.component';
 import { HerosectionComponent } from '../herosection/herosection.component';
+import { TrendingNewsCardsComponent } from '../trending-news-cards/trending-news-cards.component';
 import { CommonModule } from '@angular/common';
 import { FeaturecardComponent } from '../featurecard/featurecard.component';
 
 @Component({
   selector: 'app-home',
-  imports: [NavbarComponent, HerosectionComponent, CommonModule, FeaturecardComponent],
+  imports: [SidebarComponent, HerosectionComponent, TrendingNewsCardsComponent, CommonModule, FeaturecardComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

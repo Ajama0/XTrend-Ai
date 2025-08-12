@@ -1,6 +1,14 @@
-<div class="bg-white min-h-screen w-full relative pb-32">
-  <app-navbar></app-navbar>
-  <app-hero-section></app-hero-section>
+<!-- Home Page with Sidebar Layout -->
+<div class="flex min-h-screen bg-white">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+  
+  <!-- Main Content -->
+  <div class="flex-1 ml-64 overflow-x-hidden">
+    <!-- Hero Section -->
+    <app-hero-section></app-hero-section>
+    
+   
 
   <!-- Example Podcasts Section -->
   <section class="max-w-5xl mx-auto py-16 px-4">
@@ -33,6 +41,9 @@
       Podcasts at your service. Listen to anything, anywhere.
     </h2>
   </section>
+
+   <!-- Trending News Cards Section -->
+   <app-trending-news-cards></app-trending-news-cards>
 
   <!-- Services Slideshow Section -->
   <section class="max-w-6xl mx-auto py-16 px-4">
@@ -75,14 +86,22 @@
     <span class="text-xs text-gray-400">{{currentPodcast.duration}}</span>
   </div>
 
-    <!-- Vertically stacked hero-style feature cards -->
-  <div class="w-full">
-    <app-featurecard
-      *ngFor="let feature of features"
-      [title]="feature.title"
-      [description]="feature.description"
-      [image]="feature.image"
-      [badgeText]="feature.badgeText">
-    </app-featurecard>
+    <!-- Feature Cards Section -->
+    <div class="w-full py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-4">
+        <div class="text-center mb-12">
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Choose Rela AI?</h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">Transform any content into engaging podcast conversations with our advanced AI technology</p>
+        </div>
+        
+        <app-featurecard
+          *ngFor="let feature of features"
+          [title]="feature.title"
+          [description]="feature.description"
+          [image]="feature.image"
+          [badgeText]="feature.badgeText">
+        </app-featurecard>
+      </div>
+    </div>
   </div>
 </div>
