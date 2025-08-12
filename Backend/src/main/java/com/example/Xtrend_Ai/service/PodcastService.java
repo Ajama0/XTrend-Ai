@@ -92,6 +92,7 @@ public class PodcastService {
                     .contentForm(podcastRequest.getContentForm())
                     .status(Status.PROCESSING)
                     .user(user)
+                    .podcastTitle(news.getArticle().getTitle())
                     .build();
 
             podcastRepository.save(podcast);
@@ -308,7 +309,10 @@ public class PodcastService {
                 .key(key)
                 .contentForm(podcastRequest.getContentForm())
                 .status(Status.PROCESSING)
+                .podcastTitle(filename)
                 .build();
+
+
 
         podcastRepository.save(podcast);
 

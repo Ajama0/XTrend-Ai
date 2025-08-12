@@ -111,7 +111,40 @@ public class TextExtractionService {
 
 
     public String ExtractTextForTitle(String text){
-        String extracted = text.substring(0,20);
+        String trimmedText = text.trim();
+        String extracted = trimmedText.substring(0,20);
         return extracted.concat("...");
     }
+
+    public String extractTextForTitle(String text) {
+        if (text == null) return "Untitled";
+
+        // Collapse internal whitespace and trim edges
+        String t = text.replaceAll("\\s+", " ").trim();
+        if (t.isEmpty()) return "Untitled";
+
+        final int MAX = 60; // pick 50–80 for UI; 60 is a nice default
+
+        // Already short enough — return as-is (optionally capitalize first letter)
+        if (t.length() <= MAX) return capitalizeFirst(t);
+
+        // Try to cut on a word boundary before MAX
+        int cut = t.lastIndexOf(' ', MAX);
+        if (cut >= 40) { // avoid cutting way too short if there’s no space near MAX
+            return t.substring(0, cut).trim() + "…";
+        }
+
+        // Fallback: hard cut at MAX
+        return t.substring(0, MAX).trim() + "…";
+    }
+
+    private String capitalizeFirst(String s) {
+        if (s.isEmpty()) return s;
+        char first = s.charAt(0);
+        if (Character.isLetter(first)) {
+            return Character.toUpperCase(first) + s.substring(1);
+        }
+        return s;
+    }
+
 }
