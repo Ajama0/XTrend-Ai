@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { PodcastService } from '../services/podcast.service';
 import { PodcastRequest } from '../models/PodcastRequest';
 import { PodcastResponse } from '../models/PodcastResponse';
+import { switchMap, finalize } from 'rxjs/operators';
 
 type ContentType = 'website' | 'pdf' | 'ai-summarizer';
 type PodcastStyle = 'mini' | 'deep-dive';
@@ -66,19 +67,7 @@ export class HerosectionComponent {
     this.selectedFile = null;
   }
 
-  // Computed flag used to enable/disable the Create button without showing alerts
-  get isReadyToCreate(): boolean {
-    switch (this.selectedContentType) {
-      case 'website':
-        return this.inputValue.trim() !== '' && this.toHttpUrl(this.inputValue) !== null;
-      case 'pdf':
-        return this.selectedFile !== null;
-      case 'ai-summarizer':
-        return this.inputValue.trim() !== '' && this.inputValue.trim().length >= 200;
-      default:
-        return false;
-    }
-  }
+  
 
   selectPodcastStyle(style: PodcastStyle) {
     this.selectedPodcastStyle = style;
@@ -166,20 +155,27 @@ export class HerosectionComponent {
 
     console.log('Sending request:', podcastRequest);
 
-    this.podcastService.createPodcastFromInput(podcastRequest).subscribe({
-      next: (response: PodcastResponse) => {
-        console.log('Podcast creation started:', response);
-        this.isCreating = false;
-        alert('Podcast creation started! Check your email for updates.');
-      },
-      error: (error: any) => {
-        console.error('Error creating podcast:', error);
-        this.isCreating = false;
-        alert('Error creating podcast. Please try again.');
-      }
-    });
+    this.podcastService.createPodcastFromInput(podcastRequest).pipe(
+      switchMap(res => this.podcastService.pollPodcastStatus$(res.podcastId)),
+      finalize(() => this.isCreating = false),
+      ).subscribe({
+        next:(response:PodcastResponse)=>{
+          console.log("podcast completed!")
+          if(response.status === 'COMPLETED'){
+            alert("podcast ready!, check my podcasts to view yours")
+          }else{
+            alert("Podcast creation failed")
+          }
+        }, 
+        error: (err:Error)=>{
+          throw Error("error whilst creating / polling")
+        }
+      })
+
+    }
+
   }
-}
+              
 
   private validateInput(): boolean {
     switch (this.selectedContentType) {
@@ -204,6 +200,20 @@ export class HerosectionComponent {
       return url.toString(); // normalized URL (with scheme)
     } catch {
       return null;
+    }
+  }
+
+  // Computed flag used to enable/disable the Create button without showing alerts
+  get isReadyToCreate(): boolean {
+    switch (this.selectedContentType) {
+      case 'website':
+        return this.inputValue.trim() !== '' && this.toHttpUrl(this.inputValue) !== null;
+      case 'pdf':
+        return this.selectedFile !== null;
+      case 'ai-summarizer':
+        return this.inputValue.trim() !== '' && this.inputValue.trim().length >= 200;
+      default:
+        return false;
     }
   }
 

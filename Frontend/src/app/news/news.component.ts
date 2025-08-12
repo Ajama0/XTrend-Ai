@@ -10,6 +10,7 @@ import { NewsDTO } from '../models/newsDTO';
 import { PodcastResponse } from '../models/PodcastResponse';
 import { PodcastService } from '../services/podcast.service';
 import { PodcastRequest } from '../models/PodcastRequest';
+import { switchMap, finalize } from 'rxjs/operators';
 
 
 @Component({
@@ -116,27 +117,32 @@ onCardClick() {
   
     this.podcast$ = this.podcastService.createPodcastFromNews(podcastRequest);
 
-    this.podcast$.subscribe({
-      next:(response:PodcastResponse)=>{
-        if(response !== null && response !== undefined){
-        //now we can pass this podcast response for polling
-        this.podcastService.pollPodcastStatus(response)
-      }else{
-        throw new Error("Podcast response is null or undefined")
-      }
-
-    },error:(err:Error)=>{
-      throw new Error("Failed to create podcast: " + err.message)
+    this.podcastService.createPodcastFromNews(podcastRequest).pipe(
+          switchMap(res => this.podcastService.pollPodcastStatus$(res.podcastId)),
+          ).subscribe({
+            next:(response:PodcastResponse)=>{
+              console.log("podcast completed!")
+              if(response.status === 'COMPLETED'){
+                alert("podcast ready!, check my podcasts to view yours")
+              }else{
+                alert("Podcast creation failed")
+              }
+            }, 
+            error: (err:Error)=>{
+              throw Error("error whilst creating / polling")
+            }
+          })
+    
+        }
     }
-    })
 
   
-  }
+  
   
 
 
   
-}
+
 
 
 
