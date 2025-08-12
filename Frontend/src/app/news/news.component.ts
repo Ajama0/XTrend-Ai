@@ -120,7 +120,7 @@ onCardClick() {
       next:(response:PodcastResponse)=>{
         if(response !== null && response !== undefined){
         //now we can pass this podcast response for polling
-        this.pollPodcastStatus(response)
+        this.podcastService.pollPodcastStatus(response)
       }else{
         throw new Error("Podcast response is null or undefined")
       }
@@ -132,39 +132,7 @@ onCardClick() {
 
   
   }
-  /**
-   * This method will poll the backend for the podcast status
-   * we can use setInterval to poll the backend every few seconds
-   * 
-   * @param podcastResponse  - referes ti the response from the backend
-   */
-  pollPodcastStatus(podcastResponse: PodcastResponse): void {
-    console.log("Polling for podcast status with ID:", podcastResponse.podcastId);
-    const intervalId = setInterval(() => {
-      this.podcastService.getPodcastStatus(podcastResponse.podcastId).subscribe({
-        next: (response: PodcastResponse) => {
-          console.log("Current podcast status:", response.status);
-          if (response.status === 'COMPLETED' || response.status === 'FAILED') {
-            console.log("Final podcast status:", response.status);
-            clearInterval(intervalId);
-            if(response.status === 'COMPLETED'){
-              // Instead of automatically navigating, show notification
-              if (confirm('Your podcast is ready! Would you like to check it out in My Podcasts?')) {
-                this.router.navigate(['/my-podcasts']);
-              }
-            }else if(response.status === 'FAILED'){
-              console.error("Podcast generation failed.");
-              alert('Podcast generation failed. Please try again.');
-            }
-          }
-        },
-        error: (err: Error) => {
-          console.error("Error fetching podcast status:", err.message);
-          clearInterval(intervalId); // Stop polling on error
-        }
-      });
-    }, 3000); // Poll every 3 seconds (faster polling)
-  }
+  
 
 
   

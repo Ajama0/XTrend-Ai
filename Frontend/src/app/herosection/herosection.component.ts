@@ -66,6 +66,20 @@ export class HerosectionComponent {
     this.selectedFile = null;
   }
 
+  // Computed flag used to enable/disable the Create button without showing alerts
+  get isReadyToCreate(): boolean {
+    switch (this.selectedContentType) {
+      case 'website':
+        return this.inputValue.trim() !== '' && this.toHttpUrl(this.inputValue) !== null;
+      case 'pdf':
+        return this.selectedFile !== null;
+      case 'ai-summarizer':
+        return this.inputValue.trim() !== '' && this.inputValue.trim().length >= 200;
+      default:
+        return false;
+    }
+  }
+
   selectPodcastStyle(style: PodcastStyle) {
     this.selectedPodcastStyle = style;
   }
@@ -144,7 +158,8 @@ export class HerosectionComponent {
 
     // Add content-specific field
     if (this.selectedContentType === "website") {
-      podcastRequest.url = this.inputValue;
+      podcastRequest.url = this.toHttpUrl(this.inputValue) || ''
+      ;
     } else if (this.selectedContentType === "ai-summarizer") {
       podcastRequest.text = this.inputValue;
     }
@@ -169,22 +184,26 @@ export class HerosectionComponent {
   private validateInput(): boolean {
     switch (this.selectedContentType) {
       case 'website':
-        return this.inputValue.trim() !== '' && this.isValidUrl(this.inputValue);
+        return this.inputValue.trim() !== '' && this.toHttpUrl(this.inputValue) !== null;
       case 'pdf':
         return this.selectedFile !== null;
       case 'ai-summarizer':
-        return this.inputValue.trim() !== '';
+        return this.inputValue.trim() !== '' && this.inputValue.trim().length > 200;;
       default:
         return false;
     }
   }
 
-  private isValidUrl(string: string): boolean {
+  private toHttpUrl(input: string): string | null {
+    const trimmed = input.trim();
+    const candidate = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
     try {
-      new URL(string);
-      return true;
-    } catch (_) {
-      return false;
+      const url = new URL(candidate);
+      if (!['http:', 'https:'].includes(url.protocol)) return null;
+      if (!url.hostname) return null; // guard against bare schemes
+      return url.toString(); // normalized URL (with scheme)
+    } catch {
+      return null;
     }
   }
 
