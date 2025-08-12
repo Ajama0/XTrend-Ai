@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/podcast")
@@ -71,5 +72,8 @@ public class PodcastController {
 
 
     @GetMapping(path="/me")
-    public ResponseEntity<List<URL
+    public ResponseEntity<List<PodcastResponse>> getUserPodcasts(@RequestParam("username")String email){
+        List<PodcastResponse> findUserPodcasts = podcastService.getUserPodcasts(email);
+        return new ResponseEntity<>(findUserPodcasts, HttpStatus.OK);
+    }
 }

@@ -392,6 +392,23 @@ public class PodcastService {
 
         String key = UUID.randomUUID().toString();
 
+
+
+
+
+        Map<String, Object> body = new HashMap<>();
+        String title;
+        if (!isTextEmpty) {
+            /// setting the title of the podcast when text
+            title = textExtractionService.extractTextForTitle(podcastRequest.getText());
+            body.put("raw_text", podcastRequest.getText());
+        } else {
+            /// setting the title for podcast when url
+            title  = textExtractionService.extractTitleOrDomain(podcastRequest.getUrl());
+            body.put("url", podcastRequest.getUrl());
+        }
+        body.put("contentForm", contentForm.toString());
+
         Podcast podcast = Podcast.builder()
                 .podcastType(PodcastType.INPUT)
                 .news(null)
@@ -399,25 +416,12 @@ public class PodcastService {
                 .key(key)
                 .contentForm(contentForm)
                 .status(Status.PROCESSING)
+                .podcastTitle(title)
                 .build();
 
-
-
-
-
-        Map<String, Object> body = new HashMap<>();
-        if (!isTextEmpty) {
-            /// setting the title of the podcast when text
-            podcast.setPodcastTitle(textExtractionService.ExtractTextForTitle(podcastRequest.getText()));
-            body.put("raw_text", podcastRequest.getText());
-        } else {
-            /// setting the title for podcast when url
-            podcast.setPodcastTitle(textExtractionService.extractTitleOrDomain(podcastRequest.getUrl()));
-            body.put("url", podcastRequest.getUrl());
-        }
-        body.put("contentForm", contentForm.toString());
-
         podcastRepository.save(podcast);
+
+        log.info("saved podcast title is {}: " , podcast.getPodcastTitle());
 
         client.post()
                 .uri("/api/v1/podcast/create/input")
@@ -431,6 +435,10 @@ public class PodcastService {
                 .podcastId(podcast.getId())
                 .status(podcast.getStatus())
                 .build();
+    }
+
+    public List<PodcastResponse> getUserPodcasts(String email) {
+        return null;
     }
 }
 

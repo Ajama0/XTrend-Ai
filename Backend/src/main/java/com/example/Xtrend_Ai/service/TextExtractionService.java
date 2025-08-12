@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.service;
 
 
 import com.example.Xtrend_Ai.exceptions.BadRequestException;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.time.Duration;
 
+@Slf4j
 @Service
 public class TextExtractionService {
 
@@ -21,6 +23,7 @@ public class TextExtractionService {
 
     public String extractTitleOrDomain(String rawUrl) {
         String url = normalizeUrl(rawUrl);
+        log.debug("Extracting title or domain from {}", url);
         try {
             // Fetch HTML like a real browser
             Document doc = Jsoup.connect(url)
@@ -54,6 +57,7 @@ public class TextExtractionService {
     private String extractTitle(Document doc) {
         // 1) <title>
         String title = doc.title();
+        log.info("the title we got " + title);
         if (!isBlank(title)) return title;
 
         // 2) <meta property="og:title"> or <meta name="twitter:title">
@@ -94,6 +98,7 @@ public class TextExtractionService {
         if (t.length() > MAX_TITLE_LEN) {
             t = t.substring(0, MAX_TITLE_LEN - 1).trim() + "…";
         }
+       log.info("returning the tidied up title");
         return t;
     }
 
@@ -110,11 +115,7 @@ public class TextExtractionService {
     }
 
 
-    public String ExtractTextForTitle(String text){
-        String trimmedText = text.trim();
-        String extracted = trimmedText.substring(0,20);
-        return extracted.concat("...");
-    }
+
 
     public String extractTextForTitle(String text) {
         if (text == null) return "Untitled";
