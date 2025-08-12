@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { PodcastResponse } from '../models/PodcastResponse';
 import { PodcastRequest } from '../models/PodcastRequest';
 import { Router } from '@angular/router';
-import { interval, exhaustMap, takeWhile, first } from 'rxjs';
+import { interval, exhaustMap, takeWhile, last } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -53,7 +53,7 @@ export class PodcastService {
     return interval(3000).pipe(
       exhaustMap(() => this.getPodcastStatus(podcastId)),
       takeWhile(r => r.status !== 'COMPLETED' && r.status !== 'FAILED', true),
-      first() // emit the terminal response and complete
+      last() // emit the terminal response and complete
     );
   }
   

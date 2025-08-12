@@ -5,6 +5,7 @@ import { PodcastService } from '../services/podcast.service';
 import { PodcastRequest } from '../models/PodcastRequest';
 import { PodcastResponse } from '../models/PodcastResponse';
 import { switchMap, finalize } from 'rxjs/operators';
+import { Router } from '@angular/router';
 
 type ContentType = 'website' | 'pdf' | 'ai-summarizer';
 type PodcastStyle = 'mini' | 'deep-dive';
@@ -23,7 +24,7 @@ export class HerosectionComponent {
   isDragOver: boolean = false;
   isCreating: boolean = false;
 
-  constructor(private podcastService: PodcastService) {}
+  constructor(private podcastService: PodcastService, private router: Router) {}
 
   contentTypes = [
     {
@@ -123,18 +124,23 @@ export class HerosectionComponent {
     if(this.selectedContentType == "pdf"){
       const formDataRequest = this.buildFormdata();
   
-    this.podcastService.createPodcastFromPdf(formDataRequest).subscribe({
-      next: (response: PodcastResponse) => {
-        console.log('Podcast creation started:', response);
-        this.isCreating = false;
-        alert('Podcast creation started! Check your email for updates.');
-      },
-      error: (error: any) => {
-        console.error('Error creating podcast:', error);
-        this.isCreating = false;
-        alert('Error creating podcast. Please try again.');
-      }
-    });
+    this.podcastService.createPodcastFromPdf(formDataRequest).pipe(
+      switchMap(res => this.podcastService.pollPodcastStatus$(res.podcastId)),
+      finalize(() => this.isCreating = false),
+      ).subscribe({
+        next:(response:PodcastResponse)=>{
+          console.log("podcast completed!")
+          if(response.status === 'COMPLETED'){
+            alert("podcast ready!, check my podcasts to view yours")
+          }else{
+            alert("Podcast creation failed")
+          }
+        }, 
+        error: (err:Error)=>{
+          console.log(err.message)
+        }
+      })
+
   } else if(this.selectedContentType == "website" || this.selectedContentType == "ai-summarizer"){
     const [contentForm, podcastType] = this.setContentFormAndPodcastType();
     
@@ -154,12 +160,12 @@ export class HerosectionComponent {
     }
 
     console.log('Sending request:', podcastRequest);
-
     this.podcastService.createPodcastFromInput(podcastRequest).pipe(
       switchMap(res => this.podcastService.pollPodcastStatus$(res.podcastId)),
       finalize(() => this.isCreating = false),
       ).subscribe({
         next:(response:PodcastResponse)=>{
+          this.router.navigate(['/my/podcasts'])
           console.log("podcast completed!")
           if(response.status === 'COMPLETED'){
             alert("podcast ready!, check my podcasts to view yours")
@@ -168,7 +174,7 @@ export class HerosectionComponent {
           }
         }, 
         error: (err:Error)=>{
-          throw Error("error whilst creating / polling")
+          console.log(err.message)
         }
       })
 
@@ -231,11 +237,12 @@ export class HerosectionComponent {
     };
     
     formDataRequest.append(
-      'request',
+      'podcastInfo',
       new Blob([JSON.stringify(request)], { type: 'application/json' })
     );
     
     if (this.selectedFile) {
+      console.log(this.selectedFile.name)
       formDataRequest.append('file', this.selectedFile);
     }
     

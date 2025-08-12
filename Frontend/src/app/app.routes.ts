@@ -46,7 +46,7 @@ export const routes: Routes = [
             component: ExploreComponent
         },
         {
-            path: 'my-podcasts',
+            path: 'my/podcasts',
             component: PodcastComponent
         }
 ];
