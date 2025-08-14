@@ -38,6 +38,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.net.URL;
@@ -439,6 +440,41 @@ public class PodcastService {
 
     public List<PodcastResponse> getUserPodcasts(String email) {
         return null;
+    }
+
+
+    //TODO make sure the user whos pressing play is the one associated with the podcast, for now its default
+    public Map<String, Object> getPresignedAudioUrl(Long podcastId) {
+        User user = userRepository.findByEmail("harry@example.com").orElseThrow(()->new UsernameNotFoundException("User not found"));
+
+
+       Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()->new PodcastNotFoundException("Podcast not found"));
+
+       if(podcast.getUser().getEmail().equals(user.getEmail())){
+
+        try{
+            var url = s3Service.getPresignedForObject(bucketName, podcast.getKey() );
+            if (url.toString().isEmpty() || (url.toString().isBlank())){
+                throw new BadRequestException("presigned podcast url is empty or blank");
+            }
+            return Map.of("url", url);
+
+        }catch(Exception e){
+            throw new BadRequestException("an error occured while getting presigned podcast url");
+        }
+       }else{
+           throw new UsernameNotFoundException("this user is not associated with this podcast");
+       }
+
+
+
+
+
+
+
+
+
+
     }
 }
 

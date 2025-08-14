@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai;
 
 
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -13,7 +14,10 @@ public class XtrendAiApplication {
 		SpringApplication.run(XtrendAiApplication.class, args);
 
 
+
 	}
+
+
 
 
 }

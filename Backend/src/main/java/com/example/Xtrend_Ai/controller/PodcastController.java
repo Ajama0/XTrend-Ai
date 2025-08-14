@@ -5,6 +5,7 @@ import com.example.Xtrend_Ai.dto.PodcastResponse;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.service.PodcastService;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/v1/podcast")
@@ -75,5 +77,12 @@ public class PodcastController {
     public ResponseEntity<List<PodcastResponse>> getUserPodcasts(@RequestParam("username")String email){
         List<PodcastResponse> findUserPodcasts = podcastService.getUserPodcasts(email);
         return new ResponseEntity<>(findUserPodcasts, HttpStatus.OK);
+    }
+
+
+    @GetMapping(path="/audio/url/{id}")
+    public ResponseEntity<Map<String, Object>> fetchAudioUrl(@PathVariable("id") Long podcastId){
+        return ResponseEntity.ok(podcastService.getPresignedAudioUrl(podcastId));
+
     }
 }

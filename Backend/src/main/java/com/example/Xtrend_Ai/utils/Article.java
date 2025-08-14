@@ -58,7 +58,7 @@ public class Article {
     @Transient
     private List<String> category;
 
-
+    @Transient
     private Long newsId;
 
 

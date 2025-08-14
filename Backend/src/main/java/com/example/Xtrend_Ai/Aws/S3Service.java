@@ -60,7 +60,7 @@ public class S3Service {
      * - however the credentials to our bucket are hidden
      * - instead of returning bytes from the image recieved from AWS..
      * every time a user makes a request we generate a signed url
-     * url expiration time is set to 7 days
+     * url expiration time is set to 7 days, however we will refresh this every 6th day and override the db.
      *
      * @return presigned URL
      */
