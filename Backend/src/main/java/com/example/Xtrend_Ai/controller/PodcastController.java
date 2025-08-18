@@ -75,7 +75,7 @@ public class PodcastController {
 
     @GetMapping(path="/me")
     public ResponseEntity<List<PodcastResponse>> getUserPodcasts(@RequestParam("username")String email){
-        List<PodcastResponse> findUserPodcasts = podcastService.getUserPodcasts(email);
+        List<PodcastResponse> findUserPodcasts = podcastService.getUserPodcast(email);
         return new ResponseEntity<>(findUserPodcasts, HttpStatus.OK);
     }
 

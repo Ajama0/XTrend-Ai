@@ -11,6 +11,6 @@ import java.util.List;
 public interface PodcastRepository extends JpaRepository<Podcast, Long> {
 
 
-    @Query("SELECT p from Podcast p where p.user.email=?1")
+    @Query("SELECT p FROM Podcast p WHERE p.user.email = ?1 AND (p.status = 'COMPLETED' OR p.status = 'PROCESSING')")
     List<Podcast> findUserPodcasts(String email);
 }

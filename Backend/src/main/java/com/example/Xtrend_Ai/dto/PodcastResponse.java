@@ -31,5 +31,8 @@ public class PodcastResponse {
     private List<String> country;
     private List<String>category;
 
+    private String podcastTagline;
+
+
 
 }
