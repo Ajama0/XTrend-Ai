@@ -5,6 +5,8 @@ import { PodcastService } from '../services/podcast.service';
 import { Observable, Subscription, interval } from 'rxjs';
 import { switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { PodcastResponse } from '../models/PodcastResponse';
+import { tap } from 'rxjs/operators';
+import { signedUrlResponse } from '../models/signedUrlResponse';
 
 @Component({
   selector: 'app-podcast',
@@ -17,6 +19,25 @@ export class PodcastComponent implements OnInit, OnDestroy {
   isLoading: boolean = true;
   currentlyPlaying: PodcastResponse | null = null;
   private pollingSubscription?: Subscription;
+  private currentAudio: HTMLAudioElement | null = null;
+  
+  // Audio player state
+  isPlaying: boolean = false;
+  currentTime: number = 0;
+  duration: number = 0;
+  playbackRate: number = 1;
+  volume: number = 1;
+  
+  // Notification state
+  showNotification: boolean = false;
+  notificationMessage: string = '';
+  notificationPodcast: PodcastResponse | null = null;
+
+  // Placeholder data for demo (since you removed it but HTML still needs it)
+  placeholderPodcasts: any[] = [];
+
+  // Math helper for templates
+  Math = Math;
 
   /**
    * Track by function for ngFor performance
@@ -26,7 +47,6 @@ export class PodcastComponent implements OnInit, OnDestroy {
   }
 
   constructor(
-    private route: ActivatedRoute, 
     private podcastService: PodcastService
   ) {}
 
@@ -38,6 +58,8 @@ export class PodcastComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Clean up polling when component is destroyed
     this.stopPolling();
+    // Clean up audio and event listeners
+    this.stopPodcast();
   }
 
   /**
@@ -83,7 +105,8 @@ export class PodcastComponent implements OnInit, OnDestroy {
    * Updates the podcasts list when status changes
    */
   private startPollingForProcessingPodcasts(): void {
-    this.pollingSubscription = interval(5000).pipe( // Poll every 5 seconds
+    this.pollingSubscription = interval(5000).pipe( 
+      tap(() => console.log("polling again")),
       switchMap(() => this.podcastService.getMyPodcasts()),
       distinctUntilChanged((prev, curr) => 
         JSON.stringify(prev.map(p => ({id: p.podcastId, status: p.status}))) === 
@@ -91,6 +114,7 @@ export class PodcastComponent implements OnInit, OnDestroy {
       )
     ).subscribe({
       next: (newPodcasts: PodcastResponse[]) => {
+        console.log("status changed!")
         // Check if any podcast changed from PROCESSING to COMPLETED
         const oldProcessingPodcasts = this.podcasts.filter(p => p.status === 'PROCESSING');
         
@@ -120,33 +144,30 @@ export class PodcastComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Show notification when a podcast is completed
+   * Show notification when a podcast is completed (Angular way)
    */
   private showPodcastCompletedNotification(podcast: PodcastResponse): void {
-    // Create a temporary notification element
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in';
-    notification.innerHTML = `
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-        </svg>
-        <span>Podcast "${podcast.podcastTagline || 'Untitled'}" is ready!</span>
-      </div>
-    `;
+    this.notificationPodcast = podcast;
+    this.notificationMessage = `Podcast "${podcast.podcastTagline || 'Untitled'}" is ready!`;
+    this.showNotification = true;
     
-    document.body.appendChild(notification);
-    
-    // Remove notification after 4 seconds
+    // Auto-hide notification after 4 seconds
     setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
+      this.hideNotification();
     }, 4000);
   }
 
   /**
-   * Play a podcast
+   * Hide the notification
+   */
+  hideNotification(): void {
+    this.showNotification = false;
+    this.notificationMessage = '';
+    this.notificationPodcast = null;
+  }
+
+  /**
+   * Play a podcast using cached/new signed URL
    */
   playPodcast(podcast: PodcastResponse): void {
     if (podcast.status !== 'COMPLETED') {
@@ -154,13 +175,16 @@ export class PodcastComponent implements OnInit, OnDestroy {
       return;
     }
 
-    // Get presigned URL and play
-    this.podcastService.getPresignedUrl(podcast.podcastId.toString()).subscribe({
-      next: (response) => {
+    // Check cached signed URL or get new one
+    this.podcastService.checkIfSignedUrlIsExpired(podcast.podcastId).subscribe({
+      next: (response:signedUrlResponse) => {
         if (response.url) {
           this.currentlyPlaying = podcast;
-          // You can implement audio player logic here
+          this.playAudio(response.url);
           console.log('Playing podcast:', podcast.podcastTagline, 'URL:', response.url);
+        } else {
+          console.error('No URL received from backend');
+          alert('Error: Unable to get podcast URL. Please try again.');
         }
       },
       error: (error) => {
@@ -171,11 +195,146 @@ export class PodcastComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Play audio using HTML5 audio element with full controls
+   */
+  private playAudio(url: string): void {
+    // Stop any currently playing audio
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.removeEventListener('timeupdate', this.onTimeUpdate.bind(this));
+      this.currentAudio.removeEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
+      this.currentAudio.removeEventListener('ended', this.onAudioEnded.bind(this));
+      this.currentAudio = null;
+    }
+
+    // Create new audio element
+    this.currentAudio = new Audio(url);
+    this.currentAudio.volume = this.volume;
+    this.currentAudio.playbackRate = this.playbackRate;
+
+    // Add event listeners
+    this.currentAudio.addEventListener('timeupdate', this.onTimeUpdate.bind(this));
+    this.currentAudio.addEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
+    this.currentAudio.addEventListener('ended', this.onAudioEnded.bind(this));
+
+    // Play audio
+    this.currentAudio.play().then(() => {
+      this.isPlaying = true;
+    }).catch(error => {
+      console.error('Error playing audio:', error);
+      alert('Error playing podcast. Please try again.');
+    });
+  }
+
+  /**
+   * Audio event handlers
+   */
+  private onTimeUpdate(): void {
+    if (this.currentAudio) {
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.currentTime = this.currentAudio?.currentTime || 0;
+      }, 0);
+    }
+  }
+
+  private onLoadedMetadata(): void {
+    if (this.currentAudio) {
+      // Use setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+      setTimeout(() => {
+        this.duration = this.currentAudio?.duration || 0;
+      }, 0);
+    }
+  }
+
+  private onAudioEnded(): void {
+    this.isPlaying = false;
+    this.currentTime = 0;
+    this.stopPodcast();
+  }
+
+  /**
+   * Audio control methods
+   */
+  togglePlayPause(): void {
+    if (!this.currentAudio) return;
+
+    if (this.isPlaying) {
+      this.currentAudio.pause();
+      this.isPlaying = false;
+    } else {
+      this.currentAudio.play().then(() => {
+        this.isPlaying = true;
+      }).catch(error => {
+        console.error('Error playing audio:', error);
+      });
+    }
+  }
+
+  seekTo(time: number): void {
+    if (this.currentAudio) {
+      this.currentAudio.currentTime = time;
+      this.currentTime = time;
+    }
+  }
+
+  onSeekChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.seekTo(+target.value);
+  }
+
+  setPlaybackRate(rate: number): void {
+    this.playbackRate = rate;
+    if (this.currentAudio) {
+      this.currentAudio.playbackRate = rate;
+    }
+  }
+
+  onPlaybackRateChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.setPlaybackRate(+target.value);
+  }
+
+  setVolume(volume: number): void {
+    this.volume = volume;
+    if (this.currentAudio) {
+      this.currentAudio.volume = volume;
+    }
+  }
+
+  onVolumeChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.setVolume(+target.value);
+  }
+
+  /**
+   * Format time for display
+   */
+  formatTime(seconds: number): string {
+    if (isNaN(seconds)) return '0:00';
+    
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  }
+
+
+
+  /**
    * Stop currently playing podcast
    */
   stopPodcast(): void {
+    if (this.currentAudio) {
+      this.currentAudio.pause();
+      this.currentAudio.removeEventListener('timeupdate', this.onTimeUpdate.bind(this));
+      this.currentAudio.removeEventListener('loadedmetadata', this.onLoadedMetadata.bind(this));
+      this.currentAudio.removeEventListener('ended', this.onAudioEnded.bind(this));
+      this.currentAudio = null;
+    }
     this.currentlyPlaying = null;
-    // Implement stop logic
+    this.isPlaying = false;
+    this.currentTime = 0;
+    this.duration = 0;
   }
 
   /**

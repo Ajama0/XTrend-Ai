@@ -5,7 +5,6 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { NewsComponent } from './news/news.component';
 import { PodcastComponent } from './podcast/podcast.component';
 import { BlogComponent } from './blog/blog.component';
-import { TempComponent } from './temp/temp.component';
 import { ExploreComponent } from './explore/explore.component';
 
 export const routes: Routes = [
@@ -37,10 +36,7 @@ export const routes: Routes = [
         {
             path: 'generate-blog/:id',
             component:BlogComponent
-        },        {
-            path: 'temp/audio',
-            component: TempComponent
-        },
+        },        
         {
             path: 'explore',
             component: ExploreComponent

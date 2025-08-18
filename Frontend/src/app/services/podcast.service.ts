@@ -5,6 +5,7 @@ import { Observable, interval } from 'rxjs';
 import { exhaustMap, takeWhile, last, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { PodcastResponse } from '../models/PodcastResponse';
 import { PodcastRequest } from '../models/PodcastRequest';
+import { signedUrlResponse } from '../models/signedUrlResponse';
 
 @Injectable({
   providedIn: 'root'
@@ -53,10 +54,18 @@ export class PodcastService {
    * @returns Observable<PodcastResponse[]>
    */
   getMyPodcasts(): Observable<PodcastResponse[]> {
-    return this.http.get<PodcastResponse[]>(`${this.api_base}/podcast/my-podcasts`);
+    const user = "harry@example.com"
+    return this.http.get<PodcastResponse[]>(`${this.api_base}/podcast/me?username=${user}`);
   }
 
-  // Removed pollPodcastStatus$ - polling now handled in components with more flexibility
+  /**
+   * Check if signed URL is expired and get cached or new URL
+   * @param podcastId The podcast ID
+   * @returns Observable<any> containing the signed URL response
+   */
+  checkIfSignedUrlIsExpired(podcastId: number): Observable<signedUrlResponse> {
+    return this.http.get<any>(`${this.api_base}/podcast/url/${podcastId}`);
+  }
 }
 
 

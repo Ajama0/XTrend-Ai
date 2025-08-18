@@ -117,9 +117,7 @@ onCardClick() {
   
     this.podcast$ = this.podcastService.createPodcastFromNews(podcastRequest);
 
-    this.podcastService.createPodcastFromNews(podcastRequest).pipe(
-          switchMap(res => this.podcastService.pollPodcastStatus$(res.podcastId)),
-          ).subscribe({
+    this.podcastService.createPodcastFromNews(podcastRequest).subscribe({
             next:(response:PodcastResponse)=>{
               console.log("podcast completed!")
               if(response.status === 'COMPLETED'){
