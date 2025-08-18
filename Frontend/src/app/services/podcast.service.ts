@@ -1,11 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, interval } from 'rxjs';
+import { exhaustMap, takeWhile, last, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { PodcastResponse } from '../models/PodcastResponse';
 import { PodcastRequest } from '../models/PodcastRequest';
-import { Router } from '@angular/router';
-import { interval, exhaustMap, takeWhile, last } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +12,7 @@ import { interval, exhaustMap, takeWhile, last } from 'rxjs';
 export class PodcastService {
 
   api_base = environment.apiBaseUrl;
-  constructor(private http:HttpClient, private router:Router) { }
+  constructor(private http:HttpClient) { }
 
 
   createPodcastFromNews(podcastRequest:PodcastRequest):Observable<PodcastResponse>{
@@ -49,14 +48,15 @@ export class PodcastService {
       return this.http.get<PodcastResponse>(endpoint);
   }
 
-  pollPodcastStatus$(podcastId: number): Observable<PodcastResponse> {
-    return interval(3000).pipe(
-      exhaustMap(() => this.getPodcastStatus(podcastId)),
-      takeWhile(r => r.status !== 'COMPLETED' && r.status !== 'FAILED', true),
-      last() // emit the terminal response and complete
-    );
+  /**
+   * Get all podcasts for the current user
+   * @returns Observable<PodcastResponse[]>
+   */
+  getMyPodcasts(): Observable<PodcastResponse[]> {
+    return this.http.get<PodcastResponse[]>(`${this.api_base}/podcast/my-podcasts`);
   }
-  
-  }
+
+  // Removed pollPodcastStatus$ - polling now handled in components with more flexibility
+}
 
 

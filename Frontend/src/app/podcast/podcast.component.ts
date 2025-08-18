@@ -1,105 +1,227 @@
-import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { PodcastService } from '../services/podcast.service';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, interval } from 'rxjs';
+import { switchMap, distinctUntilChanged } from 'rxjs/operators';
 import { PodcastResponse } from '../models/PodcastResponse';
 
 @Component({
   selector: 'app-podcast',
-  imports: [],
+  imports: [CommonModule, RouterLink],
   templateUrl: './podcast.component.html',
   styleUrl: './podcast.component.css'
 })
-export class PodcastComponent {
-  audioUrl!:string;
-  title = 'SpaceX launches 21 Starlink satellites on Falcon 9 rocket, lands booster on ship at sea - Space.com';
-  description = 'It was SpaceXs 41st Falcon 9 mission of the year.';
-  duration = 332; // in seconds
-  category = 'Technology';
-  generatedAt = '2 minutes ago';
-  imageUrl!:String
+export class PodcastComponent implements OnInit, OnDestroy {
+  podcasts: PodcastResponse[] = [];
+  isLoading: boolean = true;
+  currentlyPlaying: PodcastResponse | null = null;
+  private pollingSubscription?: Subscription;
 
-  currentTime = 0;
-  isPlaying = false;
-  volume = 75;
-  isMuted = false;
+  /**
+   * Track by function for ngFor performance
+   */
+  trackByPodcastId(index: number, podcast: PodcastResponse): number {
+    return podcast.podcastId;
+  }
 
-  podcast$!:Observable<PodcastResponse>
-
-  constructor(private route: ActivatedRoute, private podcastService:PodcastService) {}
+  constructor(
+    private route: ActivatedRoute, 
+    private podcastService: PodcastService
+  ) {}
 
   ngOnInit(): void {
-    const podcastId = this.route.snapshot.paramMap.get("id")
-    console.log("Podcast ID from route:", podcastId);
-    if(podcastId){
-      this.podcast$ = this.podcastService.getPresignedUrl(podcastId)
-      this.recievePodcast();
+    this.loadMyPodcasts();
+    // Polling will be started conditionally in loadMyPodcasts if needed
+  }
+
+  ngOnDestroy(): void {
+    // Clean up polling when component is destroyed
+    this.stopPolling();
+  }
+
+  /**
+   * Stop polling and clean up subscription
+   */
+  private stopPolling(): void {
+    if (this.pollingSubscription) {
+      this.pollingSubscription.unsubscribe();
+      this.pollingSubscription = undefined;
+      console.log('Polling stopped');
     }
   }
 
-
-  recievePodcast():void{
-    this.podcast$.subscribe({
-      next:(response:PodcastResponse)=>{
-        if(response !== null && response !== undefined){
-          console.log("response from s3 download:", response);
-          this.audioUrl = response.url ?? '';
-          console.log("Podcast URL:", this.audioUrl);
-          this.imageUrl = response.imageUrl ?? '';
-
-        }else{
-          throw new Error("Podcast response is null or undefined")
+  /**
+   * Load all user's podcasts initially
+   */
+  private loadMyPodcasts(): void {
+    this.isLoading = true;
+    this.podcastService.getMyPodcasts().subscribe({
+      next: (podcasts: PodcastResponse[]) => {
+        this.podcasts = podcasts;
+        this.isLoading = false;
+        console.log('Loaded podcasts:', podcasts);
+        
+        // Only start polling if there are PROCESSING podcasts
+        const hasProcessingPodcasts = podcasts.some(p => p.status === 'PROCESSING');
+        if (hasProcessingPodcasts) {
+          console.log('Found processing podcasts, starting polling...');
+          this.startPollingForProcessingPodcasts();
+        } else {
+          console.log('No processing podcasts found, no polling needed');
         }
       },
-      error:(err:Error)=>{
-        console.error("Error fetching podcast:", err);
+      error: (error) => {
+        console.error('Error loading podcasts:', error);
+        this.isLoading = false;
       }
-    })
+    });
   }
 
+  /**
+   * Start polling for any PROCESSING podcasts
+   * Updates the podcasts list when status changes
+   */
+  private startPollingForProcessingPodcasts(): void {
+    this.pollingSubscription = interval(5000).pipe( // Poll every 5 seconds
+      switchMap(() => this.podcastService.getMyPodcasts()),
+      distinctUntilChanged((prev, curr) => 
+        JSON.stringify(prev.map(p => ({id: p.podcastId, status: p.status}))) === 
+        JSON.stringify(curr.map(p => ({id: p.podcastId, status: p.status})))
+      )
+    ).subscribe({
+      next: (newPodcasts: PodcastResponse[]) => {
+        // Check if any podcast changed from PROCESSING to COMPLETED
+        const oldProcessingPodcasts = this.podcasts.filter(p => p.status === 'PROCESSING');
+        
+        // Since only one podcast processes at a time, check if it completed
+        if (oldProcessingPodcasts.length > 0) {
+          const processingPodcast = oldProcessingPodcasts[0]; // Only one processing at a time
+          const nowCompleted = newPodcasts.find(p => 
+            p.podcastId === processingPodcast.podcastId && 
+            (p.status === 'COMPLETED')
+          );
+          
+          if (nowCompleted) {
+            // Show notification and stop polling since processing is done
+            this.showPodcastCompletedNotification(processingPodcast);
+            this.stopPolling();
+          }
+        }
 
-
-
-
-
-
-
-
-  formatTime(seconds: number): string {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+        // Update the podcasts list (this happens AFTER the comparison above)
+        this.podcasts = newPodcasts;
+        
+      },
+      error: (error) => {
+        console.error('Error polling podcasts:', error);
+      }
+    });
   }
 
-  togglePlay(audio: HTMLAudioElement) {
-    this.isPlaying = !this.isPlaying;
-    this.isPlaying ? audio.play() : audio.pause();
+  /**
+   * Show notification when a podcast is completed
+   */
+  private showPodcastCompletedNotification(podcast: PodcastResponse): void {
+    // Create a temporary notification element
+    const notification = document.createElement('div');
+    notification.className = 'fixed top-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in';
+    notification.innerHTML = `
+      <div class="flex items-center gap-3">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Podcast "${podcast.podcastTagline || 'Untitled'}" is ready!</span>
+      </div>
+    `;
     
+    document.body.appendChild(notification);
+    
+    // Remove notification after 4 seconds
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        document.body.removeChild(notification);
+      }
+    }, 4000);
   }
 
-  skipForward(audio: HTMLAudioElement) {
-    audio.currentTime += 15;
+  /**
+   * Play a podcast
+   */
+  playPodcast(podcast: PodcastResponse): void {
+    if (podcast.status !== 'COMPLETED') {
+      alert('Podcast is still processing. Please wait...');
+      return;
+    }
+
+    // Get presigned URL and play
+    this.podcastService.getPresignedUrl(podcast.podcastId.toString()).subscribe({
+      next: (response) => {
+        if (response.url) {
+          this.currentlyPlaying = podcast;
+          // You can implement audio player logic here
+          console.log('Playing podcast:', podcast.podcastTagline, 'URL:', response.url);
+        }
+      },
+      error: (error) => {
+        console.error('Error getting podcast URL:', error);
+        alert('Error loading podcast. Please try again.');
+      }
+    });
   }
 
-  skipBackward(audio: HTMLAudioElement) {
-    audio.currentTime -= 15;
+  /**
+   * Stop currently playing podcast
+   */
+  stopPodcast(): void {
+    this.currentlyPlaying = null;
+    // Implement stop logic
   }
 
-  toggleMute(audio: HTMLAudioElement) {
-    this.isMuted = !this.isMuted;
-    audio.muted = this.isMuted;
+  /**
+   * Delete a podcast
+   */
+  deletePodcast(podcast: PodcastResponse): void {
+    if (confirm(`Are you sure you want to delete "${podcast.podcastTagline || 'this podcast'}"?`)) {
+      // Implement delete logic here
+      console.log('Deleting podcast:', podcast.podcastId);
+    }
   }
 
-  updateVolume(audio: HTMLAudioElement, value: number) {
-    this.volume = value;
-    audio.volume = value / 100;
+  /**
+   * Get formatted duration for display
+   */
+  getFormattedDuration(podcast: PodcastResponse): string {
+    // Since duration is not in the model, return a placeholder
+    return 'placeholder';
   }
 
-  onTimeUpdate(audio: HTMLAudioElement) {
-    this.currentTime = audio.currentTime;
+  /**
+   * Get podcast creation date for display
+   */
+  getCreatedDate(podcast: PodcastResponse): string | null {
+    // Since createdAt is not in the model, return a placeholder
+    return podcast.createdAt || '';
   }
 
+  /**
+   * Check if podcast is currently processing
+   */
+  isProcessing(podcast: PodcastResponse): boolean {
+    return podcast.status === 'PROCESSING';
+  }
 
+  /**
+   * Check if podcast is completed and playable
+   */
+  isPlayable(podcast: PodcastResponse): boolean {
+    return podcast.status === 'COMPLETED';
+  }
 
+  /**
+   * Check if podcast failed
+   */
+  isFailed(podcast: PodcastResponse): boolean {
+    return podcast.status === 'FAILED';
+  }
 }

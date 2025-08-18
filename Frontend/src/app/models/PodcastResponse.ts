@@ -10,4 +10,7 @@ export interface PodcastResponse{
     country?:Array<string>
     category?:Array<string>
 
+    podcastTagline?:string
+    createdAt?:string
+
 }

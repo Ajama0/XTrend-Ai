@@ -1,5 +1,198 @@
-<audio
-  src="https://rela-ai.s3.eu-central-1.amazonaws.com/podcast/audio/4/9697f51e-6f63-42a1-b9e6-430646075ca1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250812T152609Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIAYXWBOF4WGSYAPB5F%2F20250812%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=50fbd1dcc3a6419c0ee6f4528922a3455f6545ac68d45e201b1b3bc079ab8de3"
-  controls
-  preload="auto">
-</audio>
+<!-- My Podcasts Component -->
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Header -->
+  <div class="max-w-6xl mx-auto mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">My Podcasts</h1>
+    <p class="text-gray-600">Manage and listen to your AI-generated podcasts</p>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="max-w-6xl mx-auto">
+    <div class="flex justify-center items-center py-20">
+      <div class="flex flex-col items-center gap-4">
+        <div class="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+        <p class="text-gray-600">Loading your podcasts...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && podcasts.length === 0" class="max-w-6xl mx-auto">
+    <div class="text-center py-20">
+      <svg class="mx-auto h-24 w-24 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+      </svg>
+      <h3 class="text-xl font-medium text-gray-900 mb-2">No podcasts yet</h3>
+      <p class="text-gray-500 mb-6">Create your first podcast to get started</p>
+      <a routerLink="/" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors text-decoration-none">
+        Create Podcast
+      </a>
+    </div>
+  </div>
+
+  <!-- Podcasts Grid -->
+  <div *ngIf="!isLoading && podcasts.length > 0" class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div 
+        *ngFor="let podcast of podcasts; trackBy: trackByPodcastId"
+        class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+      >
+        <!-- Podcast Card Header -->
+        <div class="p-6">
+          <div class="flex items-start justify-between mb-4">
+            <div class="flex-1">
+              <h3 class="text-lg font-semibold text-gray-900 mb-1 line-clamp-2">
+                {{ podcast.podcastTagline || 'Untitled Podcast' }}
+              </h3>
+              <p class="text-sm text-gray-500">
+                Created {{ getCreatedDate(podcast) }}
+              </p>
+            </div>
+            
+            <!-- Status Badge -->
+            <div class="flex-shrink-0 ml-4">
+              <span 
+                *ngIf="isProcessing(podcast)"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800"
+              >
+                <div class="w-2 h-2 bg-yellow-600 rounded-full animate-pulse mr-1"></div>
+                Processing
+              </span>
+              
+              <span 
+                *ngIf="isPlayable(podcast)"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"
+              >
+                <div class="w-2 h-2 bg-green-600 rounded-full mr-1"></div>
+                Ready
+              </span>
+              
+              <span 
+                *ngIf="isFailed(podcast)"
+                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800"
+              >
+                <div class="w-2 h-2 bg-red-600 rounded-full mr-1"></div>
+                Failed
+              </span>
+            </div>
+          </div>
+
+          <!-- Podcast Description -->
+          <p *ngIf="podcast.description" class="text-gray-600 text-sm mb-4 line-clamp-3">
+            {{ podcast.description }}
+          </p>
+
+          <!-- Podcast Duration -->
+          <p class="text-xs text-gray-400 mb-4">
+            Duration: {{ getFormattedDuration(podcast) }}
+          </p>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center gap-3">
+            <!-- Play Button -->
+            <button
+              *ngIf="isPlayable(podcast)"
+              (click)="playPodcast(podcast)"
+              [disabled]="currentlyPlaying?.podcastId === podcast.podcastId"
+              class="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:bg-indigo-400 transition-colors text-sm font-medium"
+            >
+              <svg *ngIf="currentlyPlaying?.podcastId !== podcast.podcastId" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h1m4 0h1m6-7a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <svg *ngIf="currentlyPlaying?.podcastId === podcast.podcastId" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6"/>
+              </svg>
+              {{ currentlyPlaying?.podcastId === podcast.podcastId ? 'Playing' : 'Play' }}
+            </button>
+
+            <!-- Processing State -->
+            <div *ngIf="isProcessing(podcast)" class="flex items-center gap-2 text-yellow-600 text-sm">
+              <div class="w-4 h-4 border-2 border-yellow-600 border-t-transparent rounded-full animate-spin"></div>
+              <span>Creating...</span>
+            </div>
+
+            <!-- Failed State -->
+            <div *ngIf="isFailed(podcast)" class="flex items-center gap-2 text-red-600 text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>Failed</span>
+            </div>
+
+            <!-- Delete Button -->
+            <button
+              (click)="deletePodcast(podcast)"
+              class="ml-auto p-2 text-gray-400 hover:text-red-600 transition-colors"
+              title="Delete podcast"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Audio Player (if currently playing) -->
+  <div *ngIf="currentlyPlaying" class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-lg z-50">
+    <div class="max-w-6xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+            </svg>
+          </div>
+          <div>
+            <h4 class="font-medium text-gray-900">{{ currentlyPlaying.podcastTagline || 'Untitled Podcast' }}</h4>
+            <p class="text-sm text-gray-500">Now playing</p>
+          </div>
+        </div>
+        
+        <button
+          (click)="stopPodcast()"
+          class="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+        >
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Slide in animation for notifications */
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}
+</style>
