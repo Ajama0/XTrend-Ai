@@ -2,6 +2,7 @@ package com.example.Xtrend_Ai.service;
 
 import com.example.Xtrend_Ai.Aws.S3Service;
 import com.example.Xtrend_Ai.Mail.MailService;
+import com.example.Xtrend_Ai.config.cacheConfig;
 import com.example.Xtrend_Ai.dto.PodcastLimitResponse;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
@@ -16,6 +17,7 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.example.Xtrend_Ai.utils.Article;
+import com.github.benmanes.caffeine.cache.Cache;
 import jdk.jshell.spi.ExecutionControl;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,8 +56,13 @@ class PodcastServiceTest {
     private S3Service s3Service;
 
     @Mock
+    private Cache<cacheConfig.userPodcastIds, cacheConfig.signedUrl> cache;
+
+    @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private TextExtractionService textExtractionService;
     @Mock
     private WebClient webClient;
 
@@ -69,7 +76,7 @@ class PodcastServiceTest {
 
     @BeforeEach
     void setUp() {
-        underTest = Mockito.spy(new PodcastService(webClient, podcastRepository, newsRepository, userRepository, s3Service, mailService));
+        underTest = Mockito.spy(new PodcastService(webClient, podcastRepository, newsRepository, userRepository, s3Service, mailService,textExtractionService, cache));
 
     }
 
@@ -217,7 +224,7 @@ class PodcastServiceTest {
         ReflectionTestUtils.setField(underTest, "bucketName", "test-bucket");
 
         //when & then
-        underTest.getPodcast(1L);
+        //underTest.getPodcast(1L);
 
         ArgumentCaptor<String> s3captor = ArgumentCaptor.forClass(String.class);
         verify(s3Service, times(1)).getPresignedForObject(anyString(), s3captor.capture());

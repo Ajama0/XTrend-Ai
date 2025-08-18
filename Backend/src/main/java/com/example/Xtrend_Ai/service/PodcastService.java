@@ -3,6 +3,7 @@ package com.example.Xtrend_Ai.service;
 
 import com.example.Xtrend_Ai.Aws.S3Service;
 import com.example.Xtrend_Ai.Mail.MailService;
+import com.example.Xtrend_Ai.config.cacheConfig;
 import com.example.Xtrend_Ai.dto.PodcastLimitResponse;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
@@ -20,6 +21,7 @@ import com.example.Xtrend_Ai.repository.NewsRepository;
 import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.benmanes.caffeine.cache.Cache;
 import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -59,6 +61,7 @@ public class PodcastService {
     private final S3Service s3Service;
     private final MailService mailService;
     private final TextExtractionService textExtractionService;
+    private final Cache<cacheConfig.userPodcastIds, cacheConfig.signedUrl> cache;
 
 
     @Value("${bucket.name}")
@@ -425,7 +428,7 @@ public class PodcastService {
 
 
     //TODO make sure the user whos pressing play is the one associated with the podcast, for now its default
-    public Map<String, Object> getPresignedAudioUrl(Long podcastId) {
+    public URL getPresignedAudioUrl(Long podcastId) {
         User user = userRepository.findByEmail("harry@example.com").orElseThrow(()->new UsernameNotFoundException("User not found"));
 
 
@@ -439,7 +442,7 @@ public class PodcastService {
             if (url.toString().isEmpty() || (url.toString().isBlank())){
                 throw new BadRequestException("presigned podcast url is empty or blank");
             }
-            return Map.of("url", url);
+            return url;
 
         }catch(Exception e){
             throw new BadRequestException("an error occured while getting presigned podcast url");

@@ -36,12 +36,6 @@ public class PodcastController {
     }
 
 
-    @GetMapping(path="/download/{id}")
-    public ResponseEntity<PodcastResponse>downloadPodcastUrl(@PathVariable("id")Long PodcastId){
-        PodcastResponse podcastResponse = podcastService.getPodcast(PodcastId);
-        return new ResponseEntity<>(podcastResponse, HttpStatus.OK);
-    }
-
 
     @GetMapping(path = "/status/{id}")
     public ResponseEntity<PodcastResponse>PollingStatus(@PathVariable("id")Long PodcastId){
@@ -81,8 +75,10 @@ public class PodcastController {
 
 
     @GetMapping(path="/audio/url/{id}")
-    public ResponseEntity<Map<String, Object>> fetchAudioUrl(@PathVariable("id") Long podcastId){
-        return ResponseEntity.ok(podcastService.getPresignedAudioUrl(podcastId));
+    public ResponseEntity<Map<UserPodcastId, SignedUrl>> getCachedSignedUrl(@PathVariable("id") Long podcastId){
+
+
+
 
     }
 }
