@@ -1,6 +1,6 @@
 package com.example.Xtrend_Ai.service;
 
-
+import com.example.Xtrend_Ai.config.cacheConfig;
 import com.example.Xtrend_Ai.Aws.S3Service;
 import com.example.Xtrend_Ai.Mail.MailService;
 import com.example.Xtrend_Ai.config.cacheConfig;
@@ -39,11 +39,13 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import retrofit2.http.Url;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.IOException;
 import java.net.URL;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -428,37 +430,55 @@ public class PodcastService {
 
 
     //TODO make sure the user whos pressing play is the one associated with the podcast, for now its default
-    public URL getPresignedAudioUrl(Long podcastId) {
-        User user = userRepository.findByEmail("harry@example.com").orElseThrow(()->new UsernameNotFoundException("User not found"));
+    private URL getPresignedAudioUrl(Long podcastId) {
+        User user = userRepository.findByEmail("harry@example.com").orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
+        Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(() -> new PodcastNotFoundException("Podcast not found"));
 
-       Podcast podcast = podcastRepository.findById(podcastId).orElseThrow(()->new PodcastNotFoundException("Podcast not found"));
+        if (podcast.getUser().getEmail().equals(user.getEmail())) {
 
-       if(podcast.getUser().getEmail().equals(user.getEmail())){
+            try {
+                String key = "podcast/audio/%s/%s".formatted(podcast.getId(), podcast.getKey());
+                var url = s3Service.getPresignedForObject(bucketName, key);
+                if (url.toString().isEmpty() || (url.toString().isBlank())) {
+                    throw new BadRequestException("presigned podcast url is empty or blank");
+                }
+                return url;
 
-        try{
-            String key = "podcast/audio/%s/%s".formatted(podcast.getId(), podcast.getKey());
-            var url = s3Service.getPresignedForObject(bucketName, key );
-            if (url.toString().isEmpty() || (url.toString().isBlank())){
-                throw new BadRequestException("presigned podcast url is empty or blank");
+            } catch (Exception e) {
+                throw new BadRequestException("an error occured while getting presigned podcast url");
             }
-            return url;
-
-        }catch(Exception e){
-            throw new BadRequestException("an error occured while getting presigned podcast url");
+        } else {
+            throw new UsernameNotFoundException("this user is not associated with this podcast");
         }
-       }else{
-           throw new UsernameNotFoundException("this user is not associated with this podcast");
-       }
+
+    }
+
+       public cacheConfig.signedUrl checkIfSignedUrlIsPresentInCache(String email, Long podcastId){
+           // check if signed url is in cache
+           User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+           //create object for the key value
+           cacheConfig.userPodcastIds keyInfo = new cacheConfig.userPodcastIds(user.getId(),podcastId);
+
+           cacheConfig.signedUrl cached = cache.getIfPresent(keyInfo);
+
+            URL url;
+            //the cache has expiry time equal to the signed url expiry. therefore we only check if cache is null
+           if(cached == null ){
+               log.info("podcast url has expired.. a new one is being generated");
+               url = getPresignedAudioUrl(podcastId);
+               cacheConfig.signedUrl generatedUrl = new cacheConfig.signedUrl(url);
+               cache.put(keyInfo, generatedUrl);
+               return generatedUrl;
+
+           }else{
+               // this means the url has not expired therefore we can return the cached value
+               log.info("url has not expired yet.. returned cached value");
+               return cached;
 
 
-
-
-
-
-
-
-
+           }
 
     }
 }

@@ -22,6 +22,6 @@ public class cacheConfig {
 
     public record userPodcastIds(Long userId, Long podcastId) {}
 
-    public record signedUrl(URL url, LocalDateTime exp){}
+    public record signedUrl(URL url){}
 
 }
