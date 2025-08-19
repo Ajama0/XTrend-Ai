@@ -16,7 +16,7 @@ public class cacheConfig {
     @Bean
     public Cache<userPodcastIds, signedUrl> cache(){
         return Caffeine.newBuilder()
-                        .expireAfterWrite(Duration.ofMinutes(10))
+                        .expireAfterWrite(Duration.ofMinutes(2))
                                 .build();
     }
 

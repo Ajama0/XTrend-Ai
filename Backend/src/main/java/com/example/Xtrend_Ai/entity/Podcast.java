@@ -29,6 +29,7 @@ public class Podcast {
 
     private ContentForm contentForm;
 
+    @Builder.Default
     @Column(name="created_at")
     private String date = LocalDateTime.now().toString();
 

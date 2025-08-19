@@ -22,6 +22,7 @@ import com.example.Xtrend_Ai.repository.PodcastRepository;
 import com.example.Xtrend_Ai.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.benmanes.caffeine.cache.Cache;
+import jakarta.transaction.Transactional;
 import jdk.jfr.ContentType;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -78,6 +79,8 @@ public class PodcastService {
             }
             News news  = newsRepository.findById(podcastRequest.getNewsId()).orElseThrow(()->new
                     PodcastNotFoundException("News with id " + podcastRequest.getNewsId() + " not found"));
+
+            log.info(podcastRequest.toString());
 
             User user  = userRepository.findByEmail(podcastRequest.getEmail()).orElseThrow(()->
                     new UsernameNotFoundException("User not found"));
@@ -198,14 +201,18 @@ public class PodcastService {
      * @param email - the user that creates the podcasts
      * @return
      */
+    @Transactional
     public List<PodcastResponse> getUserPodcast(String email) {
         List<Podcast> getAllPodcasts = podcastRepository.findUserPodcasts(email);
 
 
         return getAllPodcasts.stream()
+
                 .map(podcast -> PodcastResponse.builder()
                         .podcastId(podcast.getId())
                         .podcastTagline(podcast.getPodcastTitle())
+                        .createdAt(podcast.getDate())
+                        .status(podcast.getStatus())
                         .build())
                 .toList();
 
@@ -466,7 +473,7 @@ public class PodcastService {
             URL url;
             //the cache has expiry time equal to the signed url expiry. therefore we only check if cache is null
            if(cached == null ){
-               log.info("podcast url has expired.. a new one is being generated");
+               log.info("podcast url has expired or hasnt been created yet .. a new one is being generated");
                url = getPresignedAudioUrl(podcastId);
                cacheConfig.signedUrl generatedUrl = new cacheConfig.signedUrl(url);
                cache.put(keyInfo, generatedUrl);
@@ -481,6 +488,17 @@ public class PodcastService {
            }
 
     }
+
+
+    /**
+     *
+     <audio
+     src="https://rela-ai.s3.eu-central-1.amazonaws.com/podcast/audio/4/9697f51e-6f63-42a1-b9e6-430646075ca1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250812T152609Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIAYXWBOF4WGSYAPB5F%2F20250812%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=50fbd1dcc3a6419c0ee6f4528922a3455f6545ac68d45e201b1b3bc079ab8de3"
+     controls
+     preload="auto">
+     </audio>
+
+     */
 }
 
 

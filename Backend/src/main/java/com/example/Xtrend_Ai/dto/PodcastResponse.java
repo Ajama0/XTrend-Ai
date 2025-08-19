@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -32,6 +33,7 @@ public class PodcastResponse {
     private List<String>category;
 
     private String podcastTagline;
+    private String createdAt;
 
 
 

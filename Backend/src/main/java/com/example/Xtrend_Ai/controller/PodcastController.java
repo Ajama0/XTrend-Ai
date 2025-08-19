@@ -1,11 +1,13 @@
 package com.example.Xtrend_Ai.controller;
 
+import com.example.Xtrend_Ai.config.cacheConfig;
 import com.example.Xtrend_Ai.dto.PodcastRequest;
 import com.example.Xtrend_Ai.dto.PodcastResponse;
 import com.example.Xtrend_Ai.entity.Podcast;
 import com.example.Xtrend_Ai.service.PodcastService;
 import lombok.RequiredArgsConstructor;
 
+import okhttp3.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -74,10 +76,10 @@ public class PodcastController {
     }
 
 
-    @GetMapping(path="/audio/url/{id}")
-    public ResponseEntity<Map<UserPodcastId, SignedUrl>> getCachedSignedUrl(@PathVariable("id") Long podcastId){
-
-
+    @GetMapping(path="/url/{id}")
+    public ResponseEntity<cacheConfig.signedUrl> getCachedSignedUrl(@PathVariable("id") Long podcastId){
+        String email = "harry@example.com";
+        return new ResponseEntity<>(podcastService.checkIfSignedUrlIsPresentInCache(email, podcastId), HttpStatus.OK);
 
 
     }
