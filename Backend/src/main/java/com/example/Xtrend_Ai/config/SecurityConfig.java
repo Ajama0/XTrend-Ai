@@ -1,22 +1,28 @@
 package com.example.Xtrend_Ai.config;
 
-import lombok.Value;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Value("${keycloak.auth.jwk.set.uri}")
+    @Value("${keycloak.auth.jwtk.set.uri}")
     private String jwkSetUri;
+
+    private final JwtFilter jwtFilter;
 
 
     @Bean
@@ -25,6 +31,10 @@ public class SecurityConfig {
                 authorizeRequests.anyRequest().authenticated()
                 ).oauth2ResourceServer(oauth2 ->oauth2
                 .jwt(Customizer.withDefaults()))
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterAfter(jwtFilter, BearerTokenAuthenticationFilter.class)
+
                 .build();
     }
 

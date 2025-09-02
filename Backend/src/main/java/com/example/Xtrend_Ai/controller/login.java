@@ -2,7 +2,7 @@ package com.example.Xtrend_Ai.controller;
 
 
 import com.example.Xtrend_Ai.entity.User;
-import com.example.Xtrend_Ai.service.LoginService;
+import com.example.Xtrend_Ai.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class login {
 
-    private final LoginService loginService;
+    private final UserService loginService;
 
     @GetMapping(path = "/test")
     public ResponseEntity<String> tester() {

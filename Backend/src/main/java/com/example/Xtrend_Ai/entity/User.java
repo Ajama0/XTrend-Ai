@@ -35,22 +35,14 @@ public class User {
     @Id
     private Long id;
 
-    @Column(name = "first_name", nullable = false, length = 50)
-    private String firstname;
-
-    @Column(name = "last_name", nullable = false, length = 50)
-    private String lastname;
-
+    @NonNull
+    private String keyCloakId;
 
     @Column(name = "email_address", nullable = false)
     private String email;
 
-    @Column(nullable = false, length = 50)
-    private String password;
 
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private List<Topics> interests = new ArrayList<>();
+
 
     @Column(name = "Created_At")
     private LocalDateTime createdAt;
