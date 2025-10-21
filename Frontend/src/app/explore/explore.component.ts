@@ -142,7 +142,7 @@ export class ExploreComponent implements OnInit {
     this.generatingPodcast = article.newsId;
     
     const podcastRequest: PodcastRequest = {
-      email: 'user@example.com', // TODO: Get from authentication service
+      email: 'harry@example.com', // TODO: Get from authentication service
       newsId: article.newsId,
       contentForm: contentForm,
       podcastType: 'NEWS'
@@ -153,11 +153,9 @@ export class ExploreComponent implements OnInit {
         console.log('Podcast creation started:', response);
         this.generatingPodcast = null;
         
-        // Start polling for podcast completion
-        this.pollPodcastStatus(response.podcastId);
-        
-        // Show success message
-        this.showPodcastCreationMessage(contentForm);
+        // Show success message - no polling, handled in My Podcasts component
+        const duration = contentForm === 'SHORT' ? '2-5 minute' : '7-20 minute';
+        alert(`${duration} podcast creation started! Check 'My Podcasts' to monitor progress.`);
       },
       error: (error) => {
         console.error('Error creating podcast:', error);
@@ -167,58 +165,7 @@ export class ExploreComponent implements OnInit {
     });
   }
 
-  private pollPodcastStatus(podcastId: number) {
-    const pollInterval = setInterval(() => {
-      this.podcastService.getPodcastStatus(podcastId).subscribe({
-        next: (response) => {
-          if (response.status === 'COMPLETED') {
-            clearInterval(pollInterval);
-            this.showPodcastReadyMessage();
-          } else if (response.status === 'FAILED') {
-            clearInterval(pollInterval);
-            alert('Podcast creation failed. Please try again.');
-          }
-        },
-        error: (error) => {
-          console.error('Error polling podcast status:', error);
-          clearInterval(pollInterval);
-        }
-      });
-    }, 3000); // Poll every 3 seconds
-  }
-
-  private showPodcastCreationMessage(type: 'SHORT' | 'LONG') {
-    const duration = type === 'SHORT' ? '2-5 minute' : '7-20 minute';
-    
-    // Show a non-intrusive notification
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-indigo-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slide-in max-w-sm';
-    notification.innerHTML = `
-      <div class="flex items-center gap-3">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-        </svg>
-        <div>
-          <div class="font-semibold">${duration} podcast started!</div>
-          <div class="text-sm opacity-90">We'll notify you when it's ready</div>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      if (document.body.contains(notification)) {
-        document.body.removeChild(notification);
-      }
-    }, 4000);
-  }
-
-  private showPodcastReadyMessage() {
-    if (confirm('Your podcast is ready! Would you like to check it out in My Podcasts?')) {
-      // Navigate to My Podcasts
-      window.location.href = '/my-podcasts';
-    }
-  }
+  // Removed polling methods - polling now handled in My Podcasts component
 
   openArticle(article: Articles) {
     window.open(article.link, '_blank');

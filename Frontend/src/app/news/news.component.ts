@@ -110,7 +110,7 @@ onCardClick() {
     const podcastRequest :PodcastRequest = 
     {
       newsId : this.newsId,
-      email :"harry@example.com", //TODO: get the email from the user
+      email : "harry@example.com", //TODO: get the email from the user
       contentForm: "SHORT",
       podcastType: "NEWS"
     }
