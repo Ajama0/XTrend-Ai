@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -28,7 +29,7 @@ public class UserService {
 
         if(user.isPresent()){
             User foundUser = user.get();
-            if(!foundUser.getEmail().equals(email)) {
+            if(!Objects.equals(foundUser.getEmail(), email)) {
                 foundUser.setEmail(email);
                 userRepository.save(foundUser);
             }

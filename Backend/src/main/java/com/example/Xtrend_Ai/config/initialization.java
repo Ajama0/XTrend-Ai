@@ -31,11 +31,8 @@ public class initialization {
              */
 
 //            User harry = User.builder()
-//                    .firstname("harry")
-//                    .lastname("james")
+//                    .keyCloakId("AAZ")
 //                    .email("harry@example.com")
-//                    .password("harry1234")
-//                    .interests(List.of(Topics.FINANCE, Topics.AI, Topics.GAMING))
 //                    .createdAt(LocalDateTime.now())
 //                    .updatedAt(LocalDateTime.now())
 //                    .build();

@@ -172,8 +172,7 @@ public class PodcastService {
                             "Great news! Your latest AI-generated podcast, is now ready.\n\n" +
                             "Head over to the Rela AI app and check it out under \"My Podcasts\".\n\n" +
                             "Thank you for using Rela AI!\n\n" +
-                            "– The Rela AI Team",
-                    podcast.getUser().getFirstname()
+                            "– The Rela AI Team"
             );
             mailService.sendMail("abasjama06@gmail.com", bodyFormat, "Your podcast is finally ready!");
             log.info("email sent");
@@ -461,7 +460,13 @@ public class PodcastService {
 
     }
 
-       public cacheConfig.signedUrl checkIfSignedUrlIsPresentInCache(String email, Long podcastId){
+    /**
+     * to reduce the number of s3 calls a cache is used
+     * @param email - email of the user to play the podcast
+     * @param podcastId - associated podcast that is to be played.
+     * @return - cached presigned url.
+     */
+    public cacheConfig.signedUrl checkIfSignedUrlIsPresentInCache(String email, Long podcastId){
            // check if signed url is in cache
            User user = userRepository.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
@@ -490,15 +495,6 @@ public class PodcastService {
     }
 
 
-    /**
-     *
-     <audio
-     src="https://rela-ai.s3.eu-central-1.amazonaws.com/podcast/audio/4/9697f51e-6f63-42a1-b9e6-430646075ca1?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Date=20250812T152609Z&X-Amz-SignedHeaders=host&X-Amz-Expires=604800&X-Amz-Credential=AKIAYXWBOF4WGSYAPB5F%2F20250812%2Feu-central-1%2Fs3%2Faws4_request&X-Amz-Signature=50fbd1dcc3a6419c0ee6f4528922a3455f6545ac68d45e201b1b3bc079ab8de3"
-     controls
-     preload="auto">
-     </audio>
-
-     */
 }
 
 
